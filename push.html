@@ -1,0 +1,155 @@
+<script src="simpleTest.js"></script>
+<script>
+
+  function push(targetArray) {
+
+    if (Array.isArray(targetArray) && (targetArray.length) && targetArray.length === Object.keys(targetArray).length) {
+      // ----------------------------------------------------------------------------------------------------------------------------------
+      for (var i = 1; i < arguments.length; i++) {//this section runs if targetArray is a normal array
+        targetArray[targetArray.length] = arguments[i];   
+      }
+      return targetArray.length;
+      // ----------------------------------------------------------------------------------------------------------------------------------
+    } else { //this section runs if targetArray is an object that is not a standard array
+
+      if (!targetArray.length || isNaN(targetArray.length)) {
+        lengthAutoIncrement = false;
+        targetArray.length = 0;
+      }
+
+      for (var i = 1; i < arguments.length; i++) {
+        targetArray[targetArray.length] = arguments[i];   
+        if (!lengthAutoIncrement){ 
+        targetArray.length++;
+        }  
+      }
+      return Object.keys(targetArray).length;  //there is no requirement that the final array/object/array like object is left with an accurate length attribute.  
+    }
+      // ----------------------------------------------------------------------------------------------------------------------------------
+
+  }
+
+  function arrayLikeObjectGenerator(){ //this function returns an array-like object made up of the passed in arguements.
+    return arguments;
+  };
+
+  tests({
+
+    'it should return the length of targetArray after any/all elements have been appended to the end of targetArray.': function () {
+      var testArray = [1, 2, 3];
+      var test = push(testArray);
+      eq(test, 3);
+    },
+    'it should append the element in an argument to targetArray': function () {
+      var testArray = [1, 2, 3];
+      var test = push(testArray, 4);
+      eq(test, 4)
+    },
+    'it should append any arguments in the passed in order, onto the end of targetArray.': function () {
+      var testArray = [1, 2, 3];
+      var pushElementOne = 4;
+      var pushElementTwo = 5;
+      var test = push(testArray, pushElementOne, pushElementTwo);
+      eq(test, 5)
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+    },
+    'it should take any primative datatypes as arguments and append them to targetArray.': function () {
+      var testArray = [1, 2, 3];
+      push(testArray, true, null, undefined, 99, "dog");
+      eq(testArray.length, 8);
+      eq(testArray[3], true);
+      eq(testArray[4], null);
+      eq(testArray[5], undefined);
+      eq(testArray[6], 99);
+      eq(testArray[7], "dog");
+
+    },
+    'It should append arrays onto targetArray as an array, without breaking it down into elements': function () {
+      var testArray = [1, 2, 3];
+      var otherArray = ["dog", "cat", "fish"]
+      var test = push(testArray, otherArray);
+      eq(testArray.length, 4);
+      eq(testArray[3][2], "fish");
+    },
+    'It should append object references to the target array': function () {
+      var doggo = { species: "dog", name: "Murray" };
+      var testArray = [1, 2, 3];
+      var test = push(testArray, doggo);
+      eq(testArray[3].name, "Murray");
+
+    },
+    'if targetArray.length does not exist it should be created and be set to 0': function () {
+      var arrayLikeObject = { name: "umlaut", species: "cat" };
+      push(arrayLikeObject);
+      eq(arrayLikeObject.length, 0);
+    },
+    'it should work with an array-like object as the targetArray.': function () {
+ 
+      var testArrayLikeObject = arrayLikeObjectGenerator("fish", "cat", "dog");
+      var test = push(testArrayLikeObject, "chicken");
+      eq(test, 4);
+      eq(testArrayLikeObject[3], "chicken");
+      eq(Array.isArray(testArrayLikeObject), false);
+    },
+
+    'if length cannot be coverted to a number, it should use [0] as a starting place to push ': function () {
+      var testObject = { name: "Murray", height: "8 inches", length: "about 12 inches" };
+      var test = push(testObject, "cat", "fish");
+      eq(test, 5);
+      eq(testObject[0], "cat");
+      eq(testObject[1], "fish");
+    }
+
+
+
+
+
+
+  });
+</script>
+
+
+//
+<!-- synopsis - The push() method adds one or more elements to the end of an array and returns the new length of the array.
+// syntax - push(targetArray, any number of arguments containing elements to attached to the end of targetArray)
+
+// it should return the  .length of targetArray after any elements have been appended to the end of targetArray.
+// it should append the elements in a passed in array onto the end of targetArray.
+// it should append the elements in any number of array arguements in the passed in order, onto the end of targetArray.
+// it should take any primative datatypes as arguments and append them to targetArray.
+// it should work with an array like object as the targetArray.
+// it should start at targetArray[0] if a length value cannot be determined or it does not exist.
+// it should push holes into targetArray if there are holes in the elements passed in. -->
+
+//
+<!-- prototype
+
+// function push(targetArray, argument1) {
+// var targetArrayFixedLength = targetArray.length;
+// for (var i = 1; i < arguments.length; i++) {
+//    var activeArgument=arguments[i];
+//     for (var j=0; j < activeArgument.length;  j++) {
+//        targetArray[targetArrayFixedLength + j]=activeArgument[j];
+//        }
+//         targetArrayFixedLength=targetArray.length;
+//        }
+//   return targetArray.length; 
+// } //I need to make sure that targetArray.length is locked in early so that it doesn't
+//   react once things start to get appended to it. It will need to update between each argument. -->
+
+//
+<!-- this is a functioning push that digs into passed in arrays.  It is overly complex for this push, and does not meet requirements;
+// function push(targetArray, argument1) {
+//   var targetArrayFixedLength = targetArray.length;
+//   for (var i = 1; i < arguments.length; i++) {
+//     var activeArgument = arguments[i];
+
+//     for (var j = 0; j < activeArgument.length; j++) {
+//       targetArray[targetArrayFixedLength + j] = activeArgument[j];
+//     }
+
+//     targetArrayFixedLength = targetArray.length;
+//   }
+//   return targetArray.length;
+// }

@@ -1,0 +1,150 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function reduceRight(array, callback, initialValue) {
+        var runningTotal;
+        var runningTotalInitialValue;
+        var arrayIndecies = Object.keys(array);//An array containing the indexes in the target array that have a value. 
+        var startingIndex = 0;
+
+        // --------------------------------------------------------------------------------------------------------------------------
+        if (initialValue) { //This section triggers if an initialValue is provided.
+            runningTotalInitialValue = initialValue;
+            startingIndex = array.length - 1; //Last element in the array.
+
+            if (arrayIndecies.length === 0) { //If there is  initialValue and no elements in the array, return initialValue. 
+                return initialValue;
+            }
+        // --------------------------------------------------------------------------------------------------------------------------
+        } else { //This section triggers if no initialValue is provided.
+           
+            if (arrayIndecies.length === 0) {  //Triggers if there is no intialValue and the target array is empty.
+                throw new TypeError("Reduce of empty array with no initial value");
+            }
+
+            if (arrayIndecies.length === 1) {  //Returns the solo value in the array if there is no intialValue supplied.
+                var onlyIndex = arrayIndecies[0];
+                var onlyElement = array[onlyIndex]
+                return onlyElement;
+            }
+
+            runningTotalInitialValue = array[array.length - 1]; //Adjust starting points if no initialValue is supplied.
+            startingIndex = array.length - 2;
+
+            while (startingIndex in array === false && startingIndex < length) {// checks for holes at startingIndex and increments (deincrements?) until it finds an index with a value.
+                startingIndex--;
+            }
+        }
+        // --------------------------------------------------------------------------------------------------------------------------
+
+        var runningTotal = runningTotalInitialValue
+
+        for (var i = startingIndex; i > -1; i--) {
+            if (i in array) {// only runs the callback if the current index has a value.
+                runningTotal = callback(runningTotal, array[i], i, array);
+            }
+        }
+        return runningTotal;
+    }
+
+    tests({
+
+        '1. If there is an intialValue, it should execute the callback once for each element in the array. ': function () {
+            var numberOfTimesCallbackHasRun = 0;
+            reduceRight([1, 2, 3], function () {
+                numberOfTimesCallbackHasRun++;
+            }, 5);
+            eq(numberOfTimesCallbackHasRun, 3);
+        },
+        '2. If there is no initialValue, it should execute the callback array.length -1 times.': function () {
+            var numberOfTimesCallbackHasRun = 0;
+            reduceRight([1, 2, 3], function () {
+                numberOfTimesCallbackHasRun++;
+            });
+            eq(2, numberOfTimesCallbackHasRun);
+        },
+        '3. If there is an intialValue, it should use that as the inital value for the running total before the callback is run once.': function () {
+            reduceRight([1], function (runningTotal) {
+                eq(runningTotal, 5);
+            }, 5);
+        },
+        '4. If there is an intialValue, it should set the last index in the array as the first currentValue, before the callback is run once.': function () {
+            reduceRight([1], function (runningTotal, currentValue) {
+                eq(currentValue, 1);
+            }, 5);
+        },
+        '5. If there is no initalValue, it should start the runningTotal as the last index in the array, before the callback is run once.': function () {
+            reduceRight([1], function (runningTotal) {
+                eq(runningTotal, 1);
+            });
+        },
+        '6. If there is no intialValue, it should start currentValue as the second to last element in the array, before the callback is run once.': function () {
+            reduceRight([1, 2], function (runningTotal, currentValue) {
+                eq(currentValue, 1);
+            });
+        },
+        '2. It should pass in the  running total (runningTotal)  to the callback as the first parameter.': function () {
+            reduceRight([1], function (runningTotal) {
+                eq(runningTotal, 5);
+            }, 5);
+        },
+        '3. It should pass in the active element (currentValue) to the callback as the second parameter.': function () {
+            reduceRight([1], function (runningTotal, currentValue) {
+                eq(currentValue, 1);
+            }, 5);
+        },
+        '4. It should pass in the active elements index (activeElementIndex) to the callback as the third parameter.': function () {
+            reduceRight([1], function (runningTotal, currentValue, currentValueIndex) {
+                eq(0, currentValueIndex);
+            }, 5);
+        },
+        '5. It should pass in the target array (targetArray) to the callback as the fourth parameter.': function () {
+            var testArray = [1, 2];
+            reduceRight(testArray, function (runningTotal, currentValue, currentValueIndex, targetArray) {
+                eq(testArray.length, targetArray.length);
+                eq(targetArray[0], 1);
+                eq(targetArray[1], 2);
+            });
+        },
+        '10. It should reduce the target array working from the highest index to the lowest index.': function () {
+            var testArray = ["t", "a", "c"];
+            var catTest = reduceRight(testArray, function (runningTotal, currentValue) {
+                return runningTotal + currentValue;
+            })
+            eq("cat", catTest);
+        },
+        '11. It should return initialValue without running the callback if there is an initialValue but the array is empty.': function () {
+            var emptyArrayTest = reduceRight([], function () { }, 5);
+            eq(emptyArrayTest, 5);
+        },
+        '12. It should return the solo value without running the callback if there is no intialValue and only one value in the array.': function () {
+            var soloValueTest = reduceRight([1], function () { });
+            eq(soloValueTest, 1);
+        },
+        '13. It should throw a type error if there is no initialValue and the array is empty.': function () {
+            var isTypeError = false;
+            try {
+                reduceRight([], function () { });
+            } catch (e) {
+                var isTypeError = (e instanceof TypeError);
+            };
+            eq(isTypeError, true);
+        },
+        '14. It should return the results from the reduction.': function () {
+            var testArray = ["t", "a", "c"];
+            var catTest = reduceRight(testArray, function (runningTotal, currentValue) {
+                return runningTotal + currentValue;
+            });
+            eq("cat", catTest);
+        },
+        '15. It should not run the callback on holes.': function () {
+            var numberOfTimesCallbackHasRun = 0;
+            reduceRight([1, , 3], function () {
+                numberOfTimesCallbackHasRun++;
+            }, 5);
+            eq(numberOfTimesCallbackHasRun, 2);
+        },
+
+    });
+</script>
+

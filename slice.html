@@ -1,0 +1,142 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function slice(targetArray, begin, end) {
+      
+        var newArray = [];
+
+        if (begin > 0) {
+            begin = Math.floor(begin);
+        } else {
+            begin = Math.ceil(begin);
+        }
+
+        if (end > 0) {
+            end = Math.floor(end);
+        } else {
+            end = Math.ceil(end);
+        }
+
+        var startingIndex = begin || 0;
+        var endIndex = end || targetArray.length;
+
+        if (begin < 0) {
+            startingIndex = endIndex + begin;
+        }
+
+        if (end < 0) {
+            endIndex = targetArray.length + end;
+        }
+
+        if (end > targetArray.length) {
+            endIndex = targetArray.length;
+        }
+
+        for (var i = startingIndex; i < endIndex; i++) {
+            newArray.push(targetArray[i]);
+        }
+        return newArray;
+    };
+    tests({
+        'It should return a  copy of elements from targetArray, in a new array, in their original order': function () {
+            var testArray = [1, 2];
+            var sliceTest = slice(testArray);
+            eq(testArray.length, sliceTest.length);
+            eq(testArray[0], sliceTest[0]);
+            eq(testArray[1], sliceTest[1]);
+        },
+        'It should not alter the targetArray.': function () {
+            var testArray = [1, 2];
+            var sliceTest = slice(testArray);
+            eq(testArray.length, sliceTest.length);
+            eq(testArray[0], sliceTest[0]);
+            eq(testArray[1], sliceTest[1]);
+        },
+        'It should copy object references into the new array, and it should refer to the same object as in targetArray. ': function () {
+            var dog = { name: "murray", height: "short" };
+            var testArray = [1, 2, dog, 3];
+            var sliceTest = slice(testArray);
+            eq(sliceTest[2], dog);
+            eq(sliceTest[2].name, "murray");
+        },
+        'It should accept a begin which states which index to start the slice from.': function () {
+            var testArray = [1, 2, 3, 4, 5];
+            var test = slice(testArray, 3);
+            eq(test.length, 2)
+        },
+        'It should accept an end which states the first index not included in the new array.': function () {
+            testArray = [1, 2, 3, 4, 5];
+            var test = slice(testArray, 0, 2);
+            eq(test.length, 2);
+        },
+        'If a negative number is provided for begin, it will be used as an offset from the end of targetArray.': function () {
+            var testArray = [1, 2, 3];
+            var test = slice([1, 2, 3], -2);
+            eq(test.length, 2);
+        },
+        'If a negative number is provided as end, it should be used as an offset from the end of the targetArray. ': function () {
+            var testArray = [1, 2, 3];
+            var test = slice([1, 2, 3], 0, -2);
+            eq(test.length, 1);
+        },
+        'It should start the slice at  [0] if no begin is provided.': function () {
+            var testArray = [1, 2, 3];
+            var test = slice([1, 2, 3]);
+            eq(test.length, testArray.length);
+        },
+        'It should return an empty array if begin is greater than targetArray.length.': function () {
+            var testArray = [1, 2, 3];
+            var test = slice(testArray, 4);
+            eq([].length, test.length);
+        },
+        'It should extract elements through the end of the array if no end is provided.': function () {
+            var testArray = [1, 2, 3];
+            var test = slice(testArray, 1);
+            eq(test.length, 2);
+        },
+        'It should extract elements through the end of the array if end is greater than the length of the targetArray.': function () {
+            var testArray = [1, 2, 3];
+            var test = slice(testArray, 1, 99);
+            eq(test.length, 2)
+        },
+        'It should copy holes into the new array if their indexes would be copied.': function () {
+            var testArrayWithHoles = [1, , 3, , 5, , 7];
+            var test = slice(testArrayWithHoles);
+            eq(testArrayWithHoles.length, test.length);
+        },
+        'If slice is called on an array-like object it should return an array.': function () {
+            var arrayLikeObject = { 0: "cat", 1: "dog", 2: "fish" };
+            var test = slice(arrayLikeObject);
+            eq(Array.isArray(test), true);
+        },
+        'It should round any decimal numbers passed into end or begin towards zero': function () {
+            var testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            var test = slice(testArray, 1.1, 2.97);
+            eq(test.length, 1);
+            eq(test[0], 2);
+        }
+
+
+    });
+</script>
+
+<!-- // synopsis - The slice() method returns a shallow copy of a portion of an array into a new array object selected from begin to end (end not included). The original array will not be modified.
+// syntax - function slice(targetArray, optional - begin, optional - end);
+
+
+// it should not alter the targetArray.
+// it should return a shallow copy of elements from targetArray, in a new array.
+// it should copy object references into the new array, and it should refer to the same object as in targetArray. (changes in the referenced object are visible in both arrays.)
+// it should copy primative data types into the new array.
+// it should accept a begin which states which index to start the slice from.
+
+// it should accept a end where elements are extracted up to but not including.
+// if a negative number is provided for begin, it will be used as an offset from the end of targetArray.
+// it should start at [0] if no begin is provided.
+// it should return an empty array if begin is greater than targetArray.length.
+// if a negative number is provided as end, it should be used as an offset from the end of the targetArray.
+
+// it should extract elements through the end of the array if no end is provided.
+// it should extract elements through the end of the array if end is greater than the length of the targetArray.
+// it should return an array when an array like object is targetArray.
+// Binding can be done with the .call function of Function.prototype and it can also be reduced using [].slice.call(arguments) instead of Array.prototype.slice.call. Anyway, it can be simplified using bind. -->

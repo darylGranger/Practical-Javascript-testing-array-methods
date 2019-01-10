@@ -1,0 +1,165 @@
+<script src="simpleTest.js"></script>
+<script>
+
+  function find(array, callback, optionalThisObject) {
+
+    var findCallback = callback;
+    var cloneOfArray = array.slice(0);//the callback only runs on indicies in the original array, even if the callback modifies it.
+
+
+    if (optionalThisObject) {
+      findCallback = callback.bind(optionalThisObject)
+    }
+
+    for (var i = 0; i < cloneOfArray.length; i++) {  //cloneOfArray.length is used to ensure callback runs on indicies in original array
+      var search = findCallback(array[i], i, array);
+      if (search) {
+        return array[i];
+      }
+    }
+    return undefined;
+  };
+
+  tests({
+
+
+
+    '1.It should run the callback array.length times': function () {
+      var numberOfTimesCallbackHasRun = 0;
+      find([1, 2, 3], function () {
+        numberOfTimesCallbackHasRun++;
+      })
+      eq(numberOfTimesCallbackHasRun, 3)
+    },
+    '2.The active element should be available in the callback, as the first arguement': function () {
+
+      find([1], function (activeElement) {
+        eq(1, activeElement)
+      });
+
+    },
+    '3.The index of the active element should be available in the callback as the second arguement': function () {
+      find([1], function (activeElement, activeElementIndex) {
+        eq(0, activeElementIndex)
+      });
+    },
+    '4.The original array should be available in the callback as the third arguement': function () {
+      var testArray = [1, 2, 3];
+      find(testArray, function (activeElement, activeElementIndex, originalArray) {
+        eq(testArray, originalArray);
+      })
+    },
+    '5.It should accept an optional this object': function () {
+      find([1], function () {
+        eq(this.description, 'I should be available inside the callback')
+      }, { description: "I should be available inside the callback" })
+    },
+    '6.It should return the active element when the callback returns that the active element is true': function () {
+      var testArray = [1, 2, 3];
+      var returnOfFind = find(testArray, function (activeElement) {
+        return activeElement > 1;
+      });
+
+      eq(2, returnOfFind)
+    },
+    '7.If the callback does not return true by the end of the array, undefined is returned': function () {
+      var testArray = [1, 2, 3];
+      var returnOfFind = find(testArray, function (activeElement) {
+        return activeElement > 3;
+      });
+
+      eq(undefined, returnOfFind)
+    },
+    '8.It should call the callback on all array indexes even those with no value': function () {
+      var numberOfTimesCallbackHasRun = 0;
+      find([1, 2, , 3], function () {
+        numberOfTimesCallbackHasRun++;
+      })
+      eq(numberOfTimesCallbackHasRun, 4)
+    },
+    '9.It should not change the original array': function () {
+      var originalArray = [1, 2, 3];
+      find(originalArray, function () { });
+      eq(originalArray[0], 1);
+      eq(originalArray[1], 2);
+      eq(originalArray[2], 3);
+      eq(originalArray.length, 3);
+    },
+    '10.It should set the range of elements to be processed before the callback is run a single time': function () {
+      var originalArray = [1, 2, 3];
+      var otherArray = [4, 5, 6, 7, 8, 9];
+      var numberOfTimesCallbackHasRun = 0;
+
+      find(originalArray, function (activeElement, activeArrayIndex) {
+        originalArray.push(otherArray[activeArrayIndex]);
+        numberOfTimesCallbackHasRun++
+
+      });
+      eq(3, numberOfTimesCallbackHasRun)
+    },
+    '11.It should not run the callback on any elements appended to the array by the callback': function () {
+      var originalArray = [1, 2, 3];
+      var otherArray = [4, 5, 6];
+      var numberOfTimesCallbackHasRun = 0;
+
+      find(originalArray, function (activeElement, activeArrayIndex) {
+        originalArray.push(otherArray[activeArrayIndex]);
+        numberOfTimesCallbackHasRun++
+
+      });
+      eq(3, numberOfTimesCallbackHasRun);
+      eq(originalArray[3], 4);
+      eq(originalArray[4], 5);
+      eq(originalArray[5], 6);
+    },
+    '12.It should run the callback on the value of the index at the time the callback is called': function () {
+      var originalArray = [1, 2, 3, 4, 5, 6];
+      var newResult = find(originalArray, function (activeElement, activeElementIndex) {
+        originalArray[activeElementIndex + 1] = originalArray[activeElementIndex] * 10;
+        return activeElement > 5;
+      })
+      eq(10, newResult)
+    },
+    '13.It should still run the callback on any elements deleted by the callback': function () {
+      var originalArray = [1, 2, 3];
+      var numberOfTimesCallbackHasRun = 0;
+      find(originalArray, function (activeElement, activeElementIndex) {
+        originalArray.splice(activeElementIndex + 2, 1);  // deletes [2] but the callback will still run on it.
+        numberOfTimesCallbackHasRun++;
+      })
+      eq(originalArray[2], undefined);
+      eq(3, numberOfTimesCallbackHasRun);
+    },
+
+
+  });
+</script>
+
+<!--  function find(array, callback) {
+  for (var i = 0; i < array.length; i++) {
+    var test = callback(array[i] [, index][, array]).bind(this)
+    if test = true {
+      return test;
+    }
+  }
+}
+
+it passes the following into the callback in the following order
+                  -active element
+                  -optional index of active element
+                  -original array 
+it binds an optional this arguement 
+executes the callback once on each element in the array 
+when a true value is returned it returns the true element
+if no true value is returned by the end of the array, undefinded is returned
+
+
+callback is called on all indexes, including those with no assigned values
+
+If a thisArg parameter is provided, it will be used as the this for each invocation of the callback.
+
+find does not mutate the array on which it is called
+
+the array element range is locked in before the first callback is run - elements added by the callback will not be checked.
+if an array element is changed by the callback, it's value will be that of when it is passed to the call back.
+elements deleted by a callback are still visited. -->

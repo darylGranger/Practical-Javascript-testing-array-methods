@@ -1,0 +1,154 @@
+<script src="simpleTest.js"></script>
+<script>
+
+
+  function sort(targetArray, compareFunction) {
+
+    if (!compareFunction) { // this section runs if no compareFunction is provided - sort order is unicode.
+      for (var i = 0; i < targetArray.length; i++) {
+
+        var lowIndexValue = targetArray[i]; //preserves the element values pre-swap.
+        var highIndexValue = targetArray[i + 1];
+
+        var a = String(targetArray[i]);  //makes a copy of  active elements as  strings to make sure sorting is according to UTF-16
+        var b = String(targetArray[i + 1]);
+
+
+        if (b < a) { //this swaps the values if the highIndexValue has a lesser value then the lowIndexValue
+          targetArray[i] = highIndexValue;
+          targetArray[i + 1] = lowIndexValue;
+
+
+          if (i > 0) { //this if statement deals with the i++ and ensures a restart at [0] whenever a swap occurs without triggering an endless loop.
+            i = -1;
+          }
+        }
+
+      }
+    } else { // this section runs if a compare function is provided.
+
+      for (var i = 0; i < targetArray.length; i++) {
+
+        var lowIndexValue = targetArray[i]; //preserves the element values pre-swap.
+        var highIndexValue = targetArray[i + 1];
+
+        if (i + 1 < targetArray.length) {  //If highIndexValue is past the end of the indecies in the array. nothing will happen.
+
+          if (lowIndexValue !== undefined || highIndexValue !== undefined) { //if both compared elements are undefined, nothing happens.
+
+
+            var swapCheck = compareFunction(targetArray[i], targetArray[i + 1]); 
+
+
+
+            if (swapCheck > 0 || lowIndexValue === undefined) {//swaps according to the logic in the compareFunction, OR moves an undefined element towards the end.
+              targetArray[i] = highIndexValue;
+              targetArray[i + 1] = lowIndexValue;
+
+
+              if (i > 0) { //this if statement deals with the i++ and ensures a restart at [0] whenever a swap occurs without triggering an endless loop.
+                i = -1;
+              }
+            }
+          }
+        }
+      }
+    }
+    return targetArray;
+
+
+
+  }
+
+  tests({
+
+    'If no compare function is provided, it should return the targetArray with its elements  arranged from lowest to highest according to unicode values as if they were strings.': function () {
+      var testArray = [3, 2, 1];
+      sort(testArray);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+
+      var testArray = ["dog", "ball", -4, 1];
+      sort(testArray);
+      eq(testArray[0], -4);
+      eq(testArray[1], 1);
+      eq(testArray[2], "ball");
+      eq(testArray[3], "dog");
+    },
+
+
+    'If no compare function is provided, it should sort variables  containing primative datatypes according to the value they represent.': function () {
+      var zzz = 1;
+      var aaa = 5;
+      var testArray = [aaa, zzz];
+      sort(testArray);
+      eq(testArray[0], 1);
+      eq(testArray[1], 5);
+    },
+    'If no compare function is provided, it should group object references to objects together before any undefined elements, or at the end if there are no undefined elements, in the order they appear in targetArray': function () {
+      var dog = { name: "Murray" }
+      var cat = { name: "Umlaut" }
+      var fish = { name: "Bubbles" }
+      var test = sort([fish, 3, cat, 2, , dog, 1]);
+      eq(test[0], 1);
+      eq(test[1], 2);
+      eq(test[2], 3);
+      eq(test[3].name, "Bubbles");
+      eq(test[4].name, "Umlaut");
+      eq(test[5].name, "Murray");
+      eq(test[6], undefined);
+    },
+    'If no compare function is provided, it should place arrays using the value of their [0]': function () {
+      var testArray = [2, [1, "dog"], 3];
+      sort(testArray);
+      eq(Array.isArray(testArray[0]), true);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+    },
+    'It should take a compareFunction that allows for an array to be sorted according to a different ordering than unicode.': function () {
+      var testArray = [20, 11, 3];
+      var test = sort(testArray, function (a, b) {
+        return a - b;
+      });
+      eq(test[0], 3);
+      eq(test[1], 11);
+      eq(test[2], 20);
+
+
+      var banana = { cost: 1 };
+      var cookie = { cost: 2 };
+      var sweatband = { cost: 5 };
+      var testArray = [sweatband, cookie, banana];
+      var test = sort(testArray, function (a, b) {
+        return a.cost - b.cost;
+      });
+
+      eq(test[0].cost, 1);
+      eq(test[1].cost, 2);
+      eq(test[2].cost, 5);
+    },
+    'It should group any undefined elements to the end of targetArray': function () {
+      var testArray = [6, , 4, , 2];
+      sort(testArray);
+      eq(testArray[0], 2);
+      eq(testArray[1], 4);
+      eq(testArray[2], 6);
+      eq(testArray[3], undefined);
+      eq(testArray[4], undefined);
+
+      var testArray = [5, , 3, , 1];
+      var test = sort(testArray, function (a, b) {
+        return a - b;
+      });
+      eq(testArray[0], 1);
+      eq(testArray[1], 3);
+      eq(testArray[2], 5);
+      eq(testArray[3], undefined);
+      eq(testArray[4], undefined);
+    }
+
+
+
+  });
+</script>

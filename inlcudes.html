@@ -1,0 +1,87 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function includes(array, searchElement, fromIndex) {
+
+        if (fromIndex > array.length) {
+            return false;
+        }
+
+        var indexToStartSearchAt = fromIndex || 0;
+
+         if (fromIndex < 0) {
+            indexToStartSearchAt = array.length + fromIndex;
+            if (indexToStartSearchAt < 0) {
+                indexToStartSearchAt = 0;
+            }
+        }
+
+       if (fromIndex >= 0) {
+            indexToStartSearchAt = Math.floor(indexToStartSearchAt);  //this is for positive numbers and 0.
+        } else {
+            indexToStartSearchAt = Math.ceil(indexToStartSearchAt);  //this is for negative numbers.
+        }
+
+        for (var i = indexToStartSearchAt; i < array.length; i++) {
+            if (array[i] === searchElement) {
+                return true;
+            }
+        }
+        return false;
+    }
+    tests({
+
+        'It should return true if  an element in the array is strictly equal to the search element.': function () {
+            var test = includes([1, 2, 3], 3);
+            eq(test, true);
+        },
+        'It should return false if no element in the array is strictly equal to the search element.': function () {
+            var test = includes([1, 2, 3], 4);
+            eq(test, false);
+        },
+        'If a startIndex is provided it should return false if no element in the portion of the array that is searched is strictly equal to the searchElement.': function () {
+            var test = includes([1, 2, 3, 4], 1, 1);
+            eq(test, false);
+
+        },
+        'If a startIndex is provided it should return true if an element in the portion of the array that is searched is strictly equal to the searchElement.': function () {
+            var test = includes([1, 2, 3, 4], 4, 1);
+            eq(test, true);
+        },
+
+        'If fromIndex is a negative value, it should be used as an offset from the end of the array.': function () {
+            var test = includes([1, 2, 3, 4, 1], 1, -4);
+            eq(true, test);
+        },
+        'If fromIndex is a negative value and it would result in the search starting at a negative index, 0 should be used in its place.': function () {
+            var test = includes([1, 2, 3], 2, -99);
+            eq(test, true);
+        },
+        'It should not search the array if fromIndex is greater than or equal array.length and it should return false.': function () {
+            var test = includes([1, 2, 3], 1, 99);
+            eq(test, false);
+        },
+        'It should round fromIndex towards zero if it is a decimal number.': function () {
+            var test = includes([1, 2, 3], 2, 1.75);
+            var negTest = includes([1, 2, 3, 1], 1, -2.46)
+            eq(test, true);
+            eq(negTest, true);
+        }
+
+    });
+</script>
+
+<!-- synopsis - The includes() method determines whether an array includes a certain element, returning true or false as appropriate.
+syntax   includes(array, searchElement, optionalFromIndex);
+
+It should return true if  an element in the array is strictly equal to the search element.
+It should return false if no element in the array is strictly equal to the search element.
+If a startIndex is provided it should return false if no element in the portion of the array that is searched is strictly equal to the searchElement.
+If a startIndex is provided it should return true if an element in the portion of the array that is searched is strictly equal to the searchElement.
+It should start the serach at the index provided by fromIndex.
+If fromIndex is a negative value, it should be used as an offset from the end of the array.
+If fromIndex is a negative value and it would result in the search starting at a negative index, 0 should be used in its place.
+It should consider all values of 0 (-0, 0, +0) to be equal when searching.
+It should not consider false === 0.
+It should not search the array if fromIndex is greater than or equal than array.length it should not search the array and it should return false.
+It should round fromIndex towards zero if it is a decimal number. -->

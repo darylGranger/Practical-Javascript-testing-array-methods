@@ -1,0 +1,153 @@
+<script src="simpleTest.js"></script>
+<script>
+
+  function concat(array1, array2) {
+
+    var newArray = [];
+
+    for (var i = 0; i < arguments.length; i++) {
+
+      var activeElement = arguments[i];
+
+      if (Array.isArray(activeElement)) {
+        for (var j = 0; j < activeElement.length; j++) {
+          newArray.push(activeElement[j]);
+        }
+      } else {
+        newArray.push(activeElement);
+      }
+    }
+    return newArray;
+  }
+
+
+  tests({
+
+    'It should copy each element in any array-arguements to the new array.': function () {
+      var array1 = [1, 2, 3];
+      var array2 = [4, 5, 6];
+      var array3 = concat(array1, array2);
+
+      eq(array3.length, 6);
+
+    },
+    'If there are no elements beyond those in the first passed in array, it should return a shallow copy of that array.': function () {
+      var array1 = [1, 2];
+      var returnedArray = concat(array1);
+      eq(array1.length, returnedArray.length);
+      eq(array1[0], returnedArray[0]);
+      eq(array1[1], returnedArray[1]);
+      eq((array1 !== returnedArray), true);
+
+    },
+    'It should return a new array, consisting of all the elements in all the passed in arrays, in their index order.': function () {
+      var array1 = [1, 2];
+      var array2 = [3, 4];
+      var returnedArray = concat(array1, array2);
+
+      eq((array1.length + array2.length), 4);
+      eq(array1[0], returnedArray[0]);
+      eq(array1[1], returnedArray[1]);
+      eq(array2[0], returnedArray[2]);
+      eq(array2[1], returnedArray[3]);
+    },
+
+    'It should copy arguments that are strings into the new array.': function () {
+      var array1 = [1, 2];
+      var catString = "cat";
+      var array2 = [3, 4];
+      var returnedArray = concat(array1, catString, array2);
+
+      eq(returnedArray[2], "cat");
+    },
+    'It should copy arguments  that are numbers into the new array.': function () {
+      var array1 = [1, 2];
+      var returnedArray = concat(array1, 99);
+
+      eq(returnedArray[2], 99);
+    },
+    'It should copy arguments that are booleans into the new array.': function () {
+      var array1 = [1, 2];
+      var booleanTest = true;
+      var returnedArray = concat(array1, booleanTest);
+
+      eq(returnedArray[2], true);
+    },
+    'It should copy object references into the new array.': function () {
+      var array1 = [1, 2];
+      var cat = { name: "sparkles" };
+      var returnedArray = concat(array1, cat);
+
+      eq(returnedArray[2].name, "sparkles");
+    },
+    'It should not recurse into nested array elements.': function () {
+      var array1 = [1, 2];
+      var array2 = [3, [100, 101, 102], 4];
+      var returnedArray = concat(array1, array2);
+      eq(returnedArray.length, 5),
+        eq(returnedArray[3][1], 101);
+    },
+    'It should not alter any of the elements passed in.': function () {
+      var array1 = [1, 2];
+      var booleanTest = true;
+      var stringTest = "cat"
+      var returnedArray = concat(array1, booleanTest, stringTest);
+
+      eq(array1.length, 2);
+      eq(array1[0], 1);
+      eq(array1[1], 2);
+      eq(booleanTest, true);
+      eq(stringTest, "cat");
+    },
+
+  });
+</script>
+
+
+<!-- // prototype -
+// function concat(array1, array2){
+//   var newArray = [];
+//   for (var i = 0; i < arguments.length; i++) {
+   
+//     var activeElement = arguments[i];
+//     for (var j = 0; j < activeElement.length; j++) {
+    
+//       newArray.push(activeElement[j]);
+//     }
+//   }
+//   return newArray;
+// }; -->
+
+
+
+<!-- it should access each element in each array.
+if there are no elements to add to the first passed in array, it should return a shallow copy of that initial array.
+it should create a new array consisting of all the elements, in all the arrays, in order, in the passed in arrays.
+if a passed in arguement is not an array, that arguement should be added to the array with no modification.
+it should not recurse into nested array elements.
+it should not alter any of the arrays passed into it.
+it should copy object references into the new array.
+it should copy elements that are strings into the array.
+it should copy elements that are numbers into the array.
+it should copy elements that are booleans into the array.
+
+
+
+
+synopsis - The concat() method is used to merge two or more arrays. This method does not change the existing arrays, but instead returns a new array.
+
+syntax - concat(oldArry, array1, array2, array3,.....valueN)
+        - valueN - arrays and/or values to concatenate into a new array.  
+                 - if there are no values to add to the existings array, a shallow copy o
+
+                 The concat method creates a new array consisting of the elements in the object on which it is called, followed in order by, for each argument, the elements of that argument (if the argument is an array) or the argument itself (if the argument is not an array).
+                 It does not recurse into nested array arguments.
+                 The concat method does not alter this or any of the arrays provided as arguments but instead returns a shallow copy that contains copies of the same elements combined from the original arrays.
+
+                 Elements of the original arrays are copied into the new array as follows:
+                 Object references (and not the actual object): concat copies object references into the new array. Both the original and new array refer to the same object. That is, if a referenced object is modified, the changes are visible to both the new and original arrays. This includes elements of array arguments that are also arrays.
+                 Data types such as strings, numbers and booleans (not String, Number, and Boolean objects): concat copies the values of strings and numbers into the new array.
+                 Concatenating array(s)/value(s) will leave the originals untouched. Furthermore, any operation on the new array (except operations on elements which are object references) will have no effect on the original arrays, and vice versa.
+
+
+Shallow copy def - Shallow copy is a bit-wise copy of an object. A new object is created that has an exact copy of the values in the original object. If any of the fields of the object are references to other objects, just the reference addresses are copied i.e., only the memory address is copied. -->

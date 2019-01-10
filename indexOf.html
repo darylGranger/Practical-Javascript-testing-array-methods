@@ -1,0 +1,125 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function indexOf(array, searchElement, startIndex) {
+        var wholeNumberStartIndex = 0;
+
+        if (startIndex) {  //this section will run if there is a supplied startIndex
+            if (startIndex >= 0) {
+                  wholeNumberStartIndex = Math.floor(startIndex);  //this is for positive numbers and 0.
+            } else {
+                wholeNumberStartIndex = Math.ceil(startIndex);  //this is for negative numbers.
+            }
+
+            if (startIndex >= array.length) {
+                return -1;
+            }
+
+            if (startIndex < 0) {
+                wholeNumberStartIndex = array.length  + wholeNumberStartIndex;
+            }
+        }
+
+            if (wholeNumberStartIndex < 0) {
+                wholeNumberStartIndex = 0;
+            }
+        for (var i = wholeNumberStartIndex; i < array.length; i++) {
+            if (array[i] === searchElement) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
+    tests({
+
+        '1. It should return the index of the first element in the array that is strictly equal to passed in searchElement.': function () {
+            var test = indexOf([1, 2, 3], 2);
+            eq(test, 1)
+        },
+        '2. It should return -1 if no element in the array strictly equals the searchElement.': function () {
+            var test = indexOf([1, 2, 3], "dog");
+            eq(test, -1);
+        },
+        '3. If no startIndex is passed in as an argument, it should start looking for a match at [0].': function () {
+            var test = indexOf([1, 2, 3], 1);
+            eq(test, 0);
+        },
+        '4. If an startIndex is passed in as an argument, it should start looking for a match at [startIndex].': function () {
+            var test = indexOf([1, 2, 3, 1], 1, 1);
+            eq(test, 3);
+        },
+        '5. If startIndex is greater than or equal to targetArray.length, it should return -1, and the targetArray is not searched.': function () {
+            var test = indexOf([1, 2, 3], 1, 45);
+            eq(test, -1);
+        },
+        '6. If startIndex is a negative number, it should use startIndex as an offset from the end of the array.': function () {
+            var test = indexOf([1, 2, 3, 4, 5, 1], 1, -6);
+            eq(test, 0);
+        },
+        '7. If startIndex is a negative number and it would result in the startIndex being < 0, start the search at index 0.':function(){
+            var test = indexOf([1,2,3,4,1], 1, -99);
+            eq(test, 0);
+        },
+        '8. If startIndex is 0 the whole array is searched.  This is the default.': function () {
+            var test = indexOf([1, 2, 3], 1, 0);
+            eq(test, 0);
+        },
+        '9. If startIndex is a positive decimal number, it should be rounded down to a whole number': function(){
+            var testArray = [1,2,3,4,1]
+            var test = indexOf(testArray, 1, 2.56);
+
+            eq(test, 4);
+        },
+        '10. If startIndex is a negative decimal number, it should be rounded up to a whole number, before it is used to offset the starting index': function(){
+            var testArray = [1,2,3,4,1]
+            var test = indexOf(testArray, 1, -2.56);
+
+            eq(test, 4);
+        }
+
+    });
+</script>
+
+
+<!-- //Grid of tests comparing results from my indexOf function and array.prototype.indexOf. -->
+
+<!-- var testArray = [1,2,3,"dog", "cat", "fish", "dog", 1];
+
+var testMyFunction = indexOf(testArray, "dog", startIndex);
+var testMethod = testArray("dog", startIndex);
+
+startIndex is positive whole number - testArray,"dog", 2
+    my function - 3
+    prototype method - 3
+
+startIndex is a positive decimal number - testArray, "dog" 3.46
+    my function - 3
+    prototype method - 3
+
+startIndex is 0 - testArray, "dog", 0
+    my function - 3
+    prototype method - 3
+
+startIndex is a negative whole number - testArray, "dog", -2
+    my function - 6
+    prototype method - 6
+
+startIndex is a negative decimal number - testArray, "dog", -4.67
+    my function - 6
+    prototype method - 6 -->
+
+
+
+
+<!-- synopsis - The indexOf() method returns the first index at which a given element can be found in the array, or -1 if it is not present.
+syntax - indexOf(targetArray, searchElement, optionalstartIndex)
+
+It should iterate through each item in the passed in array.
+It should return the index of the first element in the array that is strictly equal to passed in searchElement.
+It should return -1 if no element in the array strictly equals the searchElement.
+If no startIndex is passed in as an argument, it should start looking for a match at [0].
+If an startIndex is passed in as an argument, it should start looking for a match at [startIndex].
+If startIndex is greater than or equal to targetArray.length, it should return -1, and the targetArray is not searched.
+If startIndex is a negative number, it should use startIndex as an offset from the end of the array.
+If startIndex is 0 the whole array is searched.  This is the default. -->

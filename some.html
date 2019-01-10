@@ -1,0 +1,184 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function some(array, callback, optionalThisArg) {
+
+        var someCallback = callback;
+        var cloneOfArray = array.slice(0)
+
+        if (optionalThisArg) {
+            someCallback = callback.bind(optionalThisArg);
+        }
+
+        if (array.length === 0) {
+            return false;
+        }
+
+        for (var i = 0; i < cloneOfArray.length; i++) {
+            if (array[i] !== undefined) {
+                var search = someCallback(array[i], i, array);
+                if (search === true) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+
+    }
+
+
+
+    tests({
+
+        '1. It should pass the callback the active element in the array as the first arguement.': function () {
+            some([1], function (activeElement) {
+                eq(1, activeElement)
+            })
+        },
+        '2. It should pass the callback the index of the active element as the second arguement.': function () {
+            some([1], function (activeElement, activeElementIndex) {
+                eq(0, activeElementIndex);
+            })
+        },
+        '3. It should pass the callback the original array as the third argument.': function () {
+            var testArray = [1]
+            some(testArray, function (activeElement, activeElementIndex, array) {
+                eq(testArray.length, array.length);
+                eq(testArray[0], array[0]);
+            })
+        },
+        '4. It should take an optional this statement.': function () {
+            some([1], function () {
+                eq(this.testText, "this should be available inside the callback.")
+            }, { testText: "this should be available inside the callback." })
+        },
+        '5. It should be able to run the callback array.length times.': function () {
+            var numberOfTimesTheCallBackHasRun = 0;
+            some([1, 2, 3], function () {
+                numberOfTimesTheCallBackHasRun++;
+            });
+            eq(numberOfTimesTheCallBackHasRun, 3);
+        },
+        '6. It should stop running the callback once it has returned true a single time.': function () {
+            var numberOfTimesTheCallBackHasRun = 0;
+            some([1, 2, 3], function (activeElement) {
+                numberOfTimesTheCallBackHasRun++;
+                return activeElement === 1;
+            })
+            eq(numberOfTimesTheCallBackHasRun, 1)
+
+        },
+        '7. It should return true if any element in the array returns truthy from the callback.': function () {
+
+            var search = some([1, 2, 3], function (activeElement) {
+                return activeElement === 3;
+            })
+
+            eq(search, true);
+        },
+        '8. It should return false if no element in the array returns truthy from the callback.': function () {
+            var search = some([1, 2, 3], function (activeElement) {
+                return activeElement > 10;
+            })
+            eq(search, false);
+        },
+        '9. it should not run the callback on indecies that have never been assigned a value.': function () {
+            var numberOfTimesCallbackHasRun = 0;
+            var testArrayWithHoles = [, 2, 3, 4];
+            some(testArrayWithHoles, function (activeElement) {
+                numberOfTimesCallbackHasRun++;
+                return activeElement > 10;
+            })
+            eq(3, numberOfTimesCallbackHasRun);
+            eq(4, testArrayWithHoles.length);
+        },
+        '10.it should not run the callback on indecies that have been deleted.': function () {
+            var originalArray = [1, 2, 3];
+            var numberOfTimesCallbackHasRun = 0;
+            some(originalArray, function (activeElement, activeElementIndex) {
+                originalArray.splice(activeElementIndex + 2, 1);  // deletes [2] but the callback will not run on it.
+                numberOfTimesCallbackHasRun++;
+            })
+            eq(originalArray[2], undefined);
+            eq(2, numberOfTimesCallbackHasRun);
+        },
+        '11. it should not mutate the array on which it is called. ': function () {
+            var testArray = [1, 2, 3];
+            some(testArray, function (activeElement) {
+                return activeElement === 2;
+            });
+            eq(testArray[0], 1);
+            eq(testArray[1], 2);
+            eq(testArray[2], 3);
+            eq(testArray.length, 3);
+        },
+        '12. it should set the range of elements to be called upon before the first time the callback is run. ': function () {
+            var arrayCallbackWillMakeLonger = [1, 2, 3];
+            var otherArray = [4, 5, 6, 7, 8, 9];
+            var numberOfTimesCallbackHasRun = 0;
+
+            some(arrayCallbackWillMakeLonger, function (activeElement, activeArrayIndex) {
+                arrayCallbackWillMakeLonger.push(otherArray[activeArrayIndex]);
+                numberOfTimesCallbackHasRun++
+
+            });
+            eq(3, numberOfTimesCallbackHasRun)
+            eq(6, arrayCallbackWillMakeLonger.length)
+        },
+        '13. it should not run the callback on elements appended to the array.': function () {
+            var originalArray = [1, 2, 3];
+            var otherArray = [4, 5, 6];
+            var numberOfTimesCallbackHasRun = 0;
+
+            some(originalArray, function (activeElement, activeArrayIndex) {
+                originalArray.push(otherArray[activeArrayIndex]);
+                numberOfTimesCallbackHasRun++
+
+            });
+            eq(3, numberOfTimesCallbackHasRun);
+            eq(6, originalArray.length);
+        },
+        '14. it should run the callback on the elements value at the time the callback is run on that value.': function () {
+            var originalArray = [1, 2, 3, 4, 5];
+            var newResult = some(originalArray, function (activeElement, activeElementIndex) {
+                originalArray[activeElementIndex + 1] = originalArray[activeElementIndex] * 10;
+                return activeElement > 5;
+            })
+            eq(true, newResult)
+        },
+        '15.it should return false if the supplied array is empty. ': function () {
+            var search = some([], function(){});
+            eq(false, search);
+        },
+
+    });
+</script>
+
+
+<!-- synopsis - The some() method tests whether at least one element in the array passes the test implemented by the provided function.
+syntax -  arr.some(callback(element[, index[, array]])[, thisArg])
+
+the callback takes 3 arguements in the following order
+                the current element being processed
+                the index of the current element being processed
+                the array that some was called on -->
+
+<!-- it should take an optional this  -->
+
+<!-- it should reutrn true if any element in the array returns truthy from the callback
+it should return false if no element in the array returns truthy from the callback -->
+
+<!-- it should be able to run the callback on each element in the array
+it should stop running the callback once it has returned true a single time -->
+<!-- it should not run the callback on indecies that have never been assigned a value.
+it should not run the callback on indecies that have been deleted -->
+
+<!-- it should not mutate the array on which it is called. -->
+
+<!-- it should set the range of elements to be called upon before the first time the callback is run.
+it should not run the callback on elements appended to the array.
+it should run the callback on the element's value at the time the callback is run on that value.
+
+it should return false if the supplied array is empty. -->

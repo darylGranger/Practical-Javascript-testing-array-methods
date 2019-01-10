@@ -1,0 +1,162 @@
+<script src="simpleTest.js"></script>
+<script>
+
+  function every(array, callback, optionalThisArg) {
+
+    var everyCallback = callback;
+    var cloneOfArray = array.slice(0);
+
+    if (optionalThisArg) {
+      everyCallback = callback.bind(optionalThisArg);
+    }
+
+    if (array.length === 0) {
+      return true;
+    }
+
+    for (var i = 0; i < cloneOfArray.length; i++) {
+      if (array[i] !== undefined) {
+
+        var search = everyCallback(array[i], i, array);
+
+        if (search === false) {
+          return false;
+        }
+      }
+    }
+    return true;
+
+  };
+
+
+
+
+  tests({
+
+    '1.it should pass  the active element into the callback as the first arguement.': function () {
+      every([1], function (activeElement) {
+        eq(1, activeElement);
+      })
+    },
+    '2.it should pass  the index of the active element into the callback as the second arguement.': function () {
+      every([1], function (activeElement, activeElementIndex) {
+        eq(0, activeElementIndex);
+      })
+    },
+    '3.it should pass  the original array into the callback as the third arguement.': function () {
+      var testArray = [1, 2, 3];
+      every(testArray, function (activeElement, activeElementIndex, arrayCallbackWillMakeLonger) {
+        eq(arrayCallbackWillMakeLonger[0], 1);
+        eq(arrayCallbackWillMakeLonger[1], 2);
+        eq(arrayCallbackWillMakeLonger[2], 3);
+        eq(arrayCallbackWillMakeLonger.length, 3);
+      })
+    },
+    '4.it should take an optional this argument for use while executing the callback.': function () {
+      every([1], function () {
+        eq(this.testText, "available inside the callback")
+      }, { testText: "available inside the callback" })
+    },
+    '5.it should be able to run the callback on every array element': function () {
+      var numberOfTimesTheCallBackHasRun = 0;
+      every([1, 2, 3], function () {
+        numberOfTimesTheCallBackHasRun++;
+      })
+      eq(3, numberOfTimesTheCallBackHasRun);
+    },
+    '6.it should stop running the callback once it returns false a single time.': function () {
+      var numberOfTimesTheCallBackHasRun = 0;
+      every([1, 2, 3], function (activeElement) {
+        numberOfTimesTheCallBackHasRun++;
+        return activeElement < 2;
+      })
+      eq(2, numberOfTimesTheCallBackHasRun)
+    },
+    '7.it should return true if the callback returns truthy for every array element.': function () {
+      var test = every([1, 2, 3], function (activeElement) {
+        return activeElement < 5;
+      })
+      eq(true, test)
+    },
+    '8.it should return false if the callback returns false for any array element.': function () {
+      var test = every([1, 2, 3], function (activeElement) {
+        return activeElement < 2;
+      })
+      eq(false, test)
+    },
+    '9.it should not mutate the original array.': function () {
+      var testArray = [1, 2, 3];
+      every(testArray, function (activeElement) {
+        return activeElement === 2;
+      });
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray.length, 3);
+    },
+    '10.it should fix the elements to be processed by the callback before the callback is run a single time.': function () {
+      var arrayCallbackWillMakeLonger = [1, 2, 3];
+      var otherArray = [4, 5, 6, 7, 8, 9];
+      var numberOfTimesCallbackHasRun = 0;
+
+      every(arrayCallbackWillMakeLonger, function (activeElement, activeArrayIndex) {
+        arrayCallbackWillMakeLonger.push(otherArray[activeArrayIndex]);
+        numberOfTimesCallbackHasRun++
+
+      });
+      eq(3, numberOfTimesCallbackHasRun)
+      eq(6, arrayCallbackWillMakeLonger.length)
+    },
+    '11.it should not run the callback on elements that are appended after the call to every begins.': function () {
+      var originalArray = [1, 2, 3];
+      var otherArray = [4, 5, 6];
+      var numberOfTimesCallbackHasRun = 0;
+
+      every(originalArray, function (activeElement, activeArrayIndex) {
+        originalArray.push(otherArray[activeArrayIndex]);
+        numberOfTimesCallbackHasRun++
+
+      });
+      eq(3, numberOfTimesCallbackHasRun);
+      eq(6, originalArray.length);
+    },
+    '12.it should pass the callback the element value at the time it is visited.': function () {
+      var originalArray = [1, 2, 3, 4, 5];
+      var newResult = every(originalArray, function (activeElement, activeElementIndex) {
+        originalArray[activeElementIndex + 1] = originalArray[activeElementIndex] * 10;
+        return activeElement > 5;
+      })
+      eq(false, newResult)
+    },
+    '13.it should not run the callback on deleted indexes.': function () {
+      var originalArray = [1, 2, 3];
+      var numberOfTimesCallbackHasRun = 0;
+      every(originalArray, function (activeElement, activeElementIndex) {
+        originalArray.splice(activeElementIndex + 2, 1);  // deletes [2] but the callback will not run on it.
+        numberOfTimesCallbackHasRun++;
+      })
+      eq(originalArray[2], undefined);
+      eq(2, numberOfTimesCallbackHasRun);
+    },
+
+    '14.is should not run the callback on indicies that have never been assigned a value.': function () {
+      var numberOfTimesCallbackHasRun = 0;
+      var testArrayWithHoles = [, 2, 3, 4];
+      every(testArrayWithHoles, function (activeElement) {
+        numberOfTimesCallbackHasRun++;
+        return activeElement < 10;
+      })
+      eq(3, numberOfTimesCallbackHasRun);
+    },
+    '15.it should return true if it is run on an empty array.': function () {
+      var emptyArray = [];
+      var search = every(emptyArray, function () { });
+
+      eq(search, true);
+    }
+  });
+</script>
+
+
+<!-- synopsis - The every() method tests whether all elements in the array pass the test implemented by the provided function.
+syntax - function every(callback(activeElement, index, array), thisObject).  only activeElement is required. -->

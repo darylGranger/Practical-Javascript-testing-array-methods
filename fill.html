@@ -1,0 +1,123 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function fill(targetArray, value, startIndex, finishIndex) {
+        var firstIndexToFill = startIndex || 0;
+        var firstIndexNotToFill = finishIndex || targetArray.length;
+
+        if (startIndex < 0) {
+            firstIndexToFill = targetArray.length + startIndex;
+            if (firstIndexToFill < 0) {
+                firstIndexToFill = 0;
+            }
+        }
+
+        if (finishIndex < 0) {
+            firstIndexNotToFill = targetArray.length + finishIndex;
+        }
+
+        for (var i = firstIndexToFill; i < firstIndexNotToFill; i++) {
+            targetArray[i] = value;
+        }
+        return targetArray;
+    };
+    tests({
+
+        'it should fill on the original array and not create a new array.': function () {
+            var testArray = [1, 2, 3];
+            fill(testArray, 0);
+            eq(testArray[0], 0);
+            eq(testArray[1], 0);
+            eq(testArray[2], 0);
+        },
+        'it should return the modified array.': function () {
+            var testArray = [1, 2, 3];
+            var test = fill(testArray, 0);
+            eq(test[0], 0);
+            eq(test[1], 0);
+            eq(test[2], 0);
+        },
+        'it should start filling the passed in value at [0] as default.': function () {
+            var testArray = [1, 2, 3];
+            var test = fill(testArray, 0);
+            eq(test[0], 0);
+        },
+        'if one is provived, it should start filling with the startIndex. ': function () {
+            var testArray = [1, 2, 3];
+            var test = fill(testArray, 0, 2);
+            eq(testArray[1], 2);
+            eq(testArray[2], 0);
+        },
+        'it should fill through the last index as default. ': function () {
+            var testArray = [1, 2, 3];
+            var test = fill(testArray, 0, 1);
+            eq(testArray[1], 0);
+            eq(testArray[2], 0);
+        },
+        'if one is provided, it should end filling at the index before endIndex - endIndex is not altered. ': function () {
+            var testArray = [1, 2, 3, 4, 5];
+            fill(testArray, 0, 0, 2);
+            eq(testArray[0], 0);
+            eq(testArray[1], 0);
+            eq(testArray[2], 3);
+        },
+        'if startIndex is negative it should be used as an offset from the end of the array. ': function () {
+            var testArray = [1, 2, 3, 4, 5];
+            fill(testArray, "dog", -3);
+            eq(testArray[1], 2);
+            eq(testArray[2], "dog");
+            eq(testArray[3], "dog");
+            eq(testArray[4], "dog");
+        },
+        'if startIndex is negative and it would result in an offset below [0], it should start with [0]': function () {
+            var testArray = [1, 2, 3];
+            fill(testArray, 0, -99);
+            eq(testArray[0], 0);
+            eq(testArray[-1], undefined);
+
+        },
+        'if endIndex is negative it should be used as an offset from the end of the array. ': function () {
+            var testArray = [1, 2, 3, 4, 5];
+            fill(testArray, "cat", 0, -3);
+            eq(testArray[1], "cat");
+            eq(testArray[2], 3);
+        },
+        'it should be able to fill with an object reference. ': function () {
+            var testDog = { name: "Murray", colour: "black" };
+            var testArray = [1, 2, 3];
+            fill(testArray, testDog);
+            eq(testArray[0], testDog);
+            eq(testArray[0].name, "Murray");
+        },
+        'if value is undefined it should fill with undefined ': function () {
+            var testArray = [1, 2, 3, 4, 5];
+            fill(testArray, undefined, 0, 5);
+            eq(testArray[0], undefined);
+
+        },
+        'it should fill holes in targetArray in the same way it fills indecies with values in them. ': function () {
+            var testArray = [1, , 3];
+            fill(testArray, "cow");
+            eq(testArray[1], "cow");
+        }
+
+
+
+    });
+</script>
+
+<!-- synopsis - The fill() method fills all the elements of an array from a start index to an end index with a static value. The end index is not included.
+syntax - fill(targetarray, value, optional - startIndex, optional - endIndex(not filled));
+
+it should fill on the original array and not create a new array.
+it should return the modified array.
+it should start filling the passed in value at [0] as default.
+it should fill through the last index as default.
+if one is provived, it should start filling at the startIndex.
+if one is provided, it should end filling at the index before endIndex - endIndex is not altered.
+if startIndex is negative it should be used as an offset from the end of the array.
+if endIndex is negative it should be used as an offset from the end of the array.
+it should be able to fill with an object reference.
+it should return an error if a hole is passed in as the value.
+it should return an error if an array-like object is passed in as targetArray.
+it should fill holes in targetArray in the same way it fills indecies with values in them. -->

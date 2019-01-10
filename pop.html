@@ -1,0 +1,58 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function pop(targetArray) {
+
+        if (targetArray.length === 0) {
+            return undefined;
+        }
+
+        var elementToReturn = targetArray[targetArray.length - 1];
+        targetArray.length = targetArray.length - 1;
+        return elementToReturn;
+    };
+
+    function arrayLikeObjectGenerator() { //this function returns an array-like object made up of the passed in arguements.
+        return arguments;
+    };
+
+    tests({
+
+        'it should remove the last element from targetArray.': function () {
+            var testArray = ["dog", "cat", "fish"];
+            pop(testArray);
+            eq(testArray.length, 2);
+        },
+        'it should return removed element from targetArray.': function () {
+            var testArray = ["dog", "cat", "fish"];
+            var test = pop(testArray);
+            eq(test, "fish");
+        },
+        'it should return undfined if targetArray is empty.': function () {
+            var emptyArray = [];
+            var test = pop(emptyArray);
+            eq(test, undefined);
+        },
+        'it should function when called on objects resembling arrays (aka array like objects).': function () {
+            var testArrayLikeObject = arrayLikeObjectGenerator("cat", "dog", "fish");
+            var test = pop(testArrayLikeObject);
+            eq(test, "fish");
+            eq(Array.isArray(testArrayLikeObject), false);
+            eq(testArrayLikeObject.length, 2);
+        },
+        'if the last index in an array is a hole, it should return undefined':function(){
+            var testArray = [1,2,,];
+            var test = pop(testArray);
+            eq(test, undefined);
+            eq (testArray.length, 2);
+        }
+
+    });
+</script>
+
+<!-- syntax - function pop(targetArray);
+
+it should remove the last element from targetArray.
+it should return removed element from targetArray.
+it should return undfined if targetArray is empty.
+it should function when called on objects resembling arrays (aka array like objects). -->

@@ -1,0 +1,310 @@
+<script src="simpleTest.js"></script>
+<script>
+
+  function copyWithin(targetArray, insertStart, startOfSlice, firstElementNotInSlice) {
+
+    var originalLength = targetArray.length;  // used later to ensure returned targetArray is correct length.
+
+    // ---------------------------------------------------------------------------------------------
+    // this section fixes non whole number values of startOfslice.
+
+
+    if (startOfSlice === undefined || "" || null | NaN) {
+      startOfSlice = 0;
+    }
+
+    if (startOfSlice === true) {
+      startOfSlice = 1;
+    }
+
+    if (typeof (startOfSlice) === "string") {
+      startOfSlice = 0;
+    }
+
+    if (startOfSlice > 0) {
+      startOfSlice = Math.floor(startOfSlice);
+    } else {
+      startOfSlice = Math.ceil(startOfSlice);
+    }
+    // ---------------------------------------------------------------------------------------------
+    // this section fixes non whole number values of firstElementNotInSlice.
+
+    if (arguments.length === 3) { //this if statement is catching empty values for firstElementNotInSlice.
+      firstElementNotInSlice = targetArray.length;
+    }
+
+    if (firstElementNotInSlice === undefined || "" || null | NaN) {
+      firstIndexNotInSlice = 0;
+    }
+  
+
+    if (firstElementNotInSlice === true) {
+      firstIndexNotInSlice = 1;
+    }
+
+    if (typeof (firstElementNotInSlice) === "string") {
+      firstIndexNotInSlice = 0;
+    }
+
+    if (firstElementNotInSlice > 0) {
+      firstIndexNotInSlice = Math.floor(firstElementNotInSlice);
+    } else {
+      firstIndexNotInSlice = Math.ceil(firstElementNotInSlice);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    //these three if blocks adjust the value into an offset from targetArray.length if the value is negative.
+
+    if (startOfSlice < 0) {
+      var firstIndexInSlice = targetArray.length + startOfSlice;
+    } else {
+      var firstIndexInSlice = startOfSlice;
+    }
+
+    if (firstElementNotInSlice < 0) {
+      var firstIndexNotInSlice = targetArray.length + firstElementNotInSlice;
+    } 
+
+    if (insertStart < 0) {
+      var firstInsertionIndex = targetArray.length + insertStart;
+    } else {
+      var firstInsertionIndex = insertStart;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    if (insertStart >= targetArray.length) {  
+      return targetArray;
+    }
+
+    var tempArray = [];
+    var m = 0;
+
+    for (var i = firstIndexInSlice; i < firstIndexNotInSlice; i++) {  //this loop creates the temp array of elements to be pasted.
+      tempArray[m] = targetArray[i];
+      m++;
+    };
+
+    var k = 0;
+    var stopPoint = tempArray.length + firstInsertionIndex
+
+    for (var j = firstInsertionIndex; j < stopPoint; j++) { //this loop pastes the temp array over the existing elements.
+
+      targetArray[j] = tempArray[k];
+      k++;
+    }
+    targetArray.length = originalLength;
+    return targetArray;
+  }
+
+  tests({
+
+    'it should use startOfSlice as the first index to be copied within. ': function () {
+      var testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      copyWithin(testArray, 0, 9);
+      eq(testArray[0], 10);
+    },
+    'it should use firstIndexNotInSlice as the first element not to be included in the slice to be copied.': function () {
+      var testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      copyWithin(testArray, 0, 5, 8);
+      eq(testArray[0], 6);
+      eq(testArray[1], 7);
+      eq(testArray[2], 8);
+      eq(testArray[3], 4);
+
+    },
+    'it should use  insertStart as the index to start filling with the copied portion of the targetArray. ': function () {
+      var testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      copyWithin(testArray, 1, 5, 8);
+      eq(testArray[0], 1);
+      eq(testArray[1], 6);
+      eq(testArray[2], 7);
+      eq(testArray[3], 8);
+      eq(testArray[4], 5);
+
+    },
+    'it should returned the modified targetArray.': function () {
+      var testArray = [1, 2, 3];
+      var test = copyWithin(testArray, 0, 1, 2);
+      eq(test[0], 2);
+      eq(test[1], 2);
+      eq(test[2], 3);
+
+    },
+    'if insertStart is => targetArray.length, nothing will be copied. ': function () {
+      var testArray = [1, 2, 3];
+      copyWithin(testArray, 4, 1, 2);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+
+    },
+    'if insertStart is negative, it should be used as an offset from the end of the array. ': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, -3, 0, 2);
+      eq(testArray[1], 2);
+      eq(testArray[2], 1);
+      eq(testArray[3], 2);
+      eq(testArray[4], 5);
+    },
+    'if startOfSlice is negative it should be used as an offset from the end of the array.': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, 0, -2, 4);
+      eq(testArray[0], 4);
+      eq(testArray[1], 2);
+
+    },
+    'if firstIndexNotInSlice is negative it should be used as an offset from the end of the array.': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, 0, 1, -3);
+      eq(testArray[0], 2);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+
+    },
+    'it should not increase the length of targetArray even if the copied portion would extend it. ': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      var test = copyWithin(testArray, 4, 0, 5);
+      eq(test.length, 5);
+    },
+    "if startOfSlice is a string, it should use a value of 0 for startOfSlice": function () {
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, 2, "dog", 1);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 1);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+    },
+    'if startOfSlice is falsy, 0 should be used in its place.': function () {
+      var testArray = [1, 2, 3];
+      copyWithin(testArray, 1, undefined, 1);
+      eq(testArray[0], 1);
+      eq(testArray[1], 1);
+      eq(testArray[2], 3);
+    },
+    "if startOfSlice's value  === true it should use 1 in its place. ": function () {
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, 2, true, 2);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 2);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+    },
+    "if startOfSlice is a decimal number it should be rounded towards zero. ": function () {
+      var testArray = [1, 2, 3];
+      copyWithin(testArray, 1, 0.5, 1);
+      eq(testArray[0], 1);
+      eq(testArray[1], 1);
+      eq(testArray[2], 3);
+    },
+    //---------------------------------------------------------------------------------------------
+    "it should return targetArray if startOfSlice => firstElementNotInSlice": function () {
+      var testArray = [1, 2];
+      var test = copyWithin(testArray, 0, 0);
+      eq(test[0], testArray[0]);
+      eq(test[1], testArray[1]);
+      eq(test.length, testArray.length);
+    },
+
+
+    "if firstElementNotInSlice is a string, it should use a value of 0 for firstElementNotInSlice": function () {
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, 2, 0, "dog");
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+    },
+    'if firstElementNotInSlice is falsy, 0 should be used in its place.': function () {
+    
+      var testArray = [1, 2, 3];
+      copyWithin(testArray, 1, 0, null);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+    },
+    "if firstElementNotInSlice's value  === true it should use 1 in its place. ": function () {
+     
+      var testArray = [1, 2, 3, 4, 5];
+      copyWithin(testArray, 2, true, 2);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 2);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+    },
+    "if firstElementNotInSlice is a decimal number it should be rounded towards zero. ": function () {
+   
+      var testArray = [1, 2, 3];
+      copyWithin(testArray, 1, 0.5, 1);
+      eq(testArray[0], 1);
+      eq(testArray[1], 1);
+      eq(testArray[2], 3);
+    }
+
+
+
+  });
+</script>
+
+
+//
+<!-- synopsis - The copyWithin() method shallow copies part of an array to another location in the same array and returns it, without modifying its size.
+// syntax - copyWithin(targetArray, insertStart, startOfSlice, firstIndexNotInSlice)
+
+// it should use  insertStart as the index to start filling with the copied portion of the targetArray.
+// if insertStart is negative, it should be used as an offset from the end of the array.
+// if insertStart is => targetArray.length, nothing will be copied.
+// if insertStart is => startOfSlice then the copied portion of the array will be trimmed to not increase targetArray.length.
+// it should use startOfSlice as the first index to be copied within.
+
+// if startOfSlice is negative it should be used as an offset from the end of the array.
+// if !startOfSlice then 0 should be used as a default.
+// it should use firstIndexNotInSlice as the first element not to be included in the slice to be copied.
+// if firstIndexNotInSlice is negative it should be used as an offset from the end of the array.
+// it should returned the modified targetArray.
+// it should not change targetArray.length. -->
+
+
+<!-- insertStart
+native
+is a string ----- insertStart = 0
+is falsy --- insertStart = 0
+is true --- insertStart = 1
+is a positive decimal --- Math.floor
+is a negative decimal --- Math.ceil
+
+mine
+is a string
+is falsy
+is true
+is a decimal
+
+startOfSlice
+native
+is a string ---- 0
+is falsy --- 0
+is true --- 1
+is a decimal --- round towards 0
+
+mine
+is a string
+is falsy
+is true
+is a decimal
+
+firstElementNotInSlice
+native
+is a string --- 0
+is falsy --- 0
+is true --- 1
+is a decimal --- round towards 0
+
+mine
+is a string
+is falsy
+is true
+is a decimal -->

@@ -1,0 +1,122 @@
+<script src="simpleTest.js"></script>
+<script>
+
+  function findIndex(array, callback, optionalThisObject) {
+
+   var findIndexCallback = callback;
+   var cloneOfArray = array.slice(0);
+
+    if (array.length === 0) {
+      return -1;
+    }
+
+   if(optionalThisObject){
+     findIndexCallback = callback.bind(optionalThisObject);
+   }
+
+    for (var i = 0; i < cloneOfArray.length; i++) {
+      var search = findIndexCallback(array[i], i, array);
+      if (search) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  tests({
+
+    '1.it should be able to run the callback array.length times': function () {
+      var numberOfTimesCallbackHasRun = 0;
+      findIndex([1, 2, 3], function () {
+        numberOfTimesCallbackHasRun++;
+      })
+      eq(3, numberOfTimesCallbackHasRun)
+    },
+    '2.it should pass in  the activeElement as the first argument in the callback': function () {
+      findIndex([1], function (activeElement) {
+        eq(1, activeElement);
+      })
+    },
+    '3.it should pass in the index of the active element as the as the second arguement in the callback': function () {
+      findIndex([1], function (activeElement, activeElementIndex) {
+        eq(0, activeElementIndex);
+      })
+    },
+    '4.it should pass in the array being iterated on as the third arguement into the callback': function () {
+      var testArray = [1];
+      findIndex(testArray, function (activeElement, activeElementIndex, originalArray) {
+        eq(originalArray, testArray);
+      })
+    },
+    '5.it should take an optional this object when executing the callback': function () {
+      findIndex([1], function(activeElement, activeElementIndex, array){
+        eq(this.test, "available inside the callback");
+      }, {test: "available inside the callback"});
+
+    },
+    '6.it should stop running the callback once it has returned true': function () {
+      var numberOfTimesCallbackHasRun = 0;
+      findIndex([1,2,3], function(activeElement){
+        numberOfTimesCallbackHasRun++;
+        return activeElement > 1;
+      })
+      eq(2, numberOfTimesCallbackHasRun)
+    },
+    '7.it should return -1 if no element in the array satisfies the callback': function () {
+      var search = findIndex([1,2,3], function(activeElement){
+        return activeElement > 4;
+      })
+      eq(search, -1)
+    },
+    '8.It should return the index of the first element to return true from the callback': function(){
+     var search = findIndex([1,2,3], function(activeElement,activeElementIndex){
+       return activeElement > 2;
+     })
+     eq(search, 2)
+    },
+    '9.it should return -1 if array.length === 0': function () {
+      var search = findIndex([], function(){});
+      eq(search, -1)
+    },
+    '10.it should run the callback on indicies with no values': function () {
+       var numberOfTimesCallbackHasRun = 0
+       findIndex([,,3,,5], function(){
+         numberOfTimesCallbackHasRun++;
+       });
+
+       eq(numberOfTimesCallbackHasRun, 5)
+
+    },
+    '11.it should not run the callback on elements appended to the array after findIndex is first called': function () {
+      var originalArray = [1,2,3]
+      var otherArray = [4,5,6]
+      var numberOfTimesCallbackHasRun = 0;
+      
+      findIndex(originalArray, function(activeElement, activeElementIndex,){
+        numberOfTimesCallbackHasRun++;
+        originalArray.push(otherArray[activeElementIndex]);
+
+      })
+      eq(numberOfTimesCallbackHasRun, 3);
+      eq(originalArray.length, 6)
+    },
+    '12.it should pass to the callback the value of the index at the time the callback is run on that index': function () {
+      var originalArray = [1, 2, 3, 4, 5, 6];
+      var newResult = findIndex(originalArray, function (activeElement, activeElementIndex) {
+        originalArray[activeElementIndex + 1] = originalArray[activeElementIndex] * 10; //changes originalArray[1] to be === 10 so it will return true
+        return activeElement > 5;
+      })
+      eq(1, newResult)
+
+    },
+    '13.it should run the callback on indicies that have been deleted since findIndex has been first called': function () {
+      var originalArray = [1, 2, 3];
+      var numberOfTimesCallbackHasRun = 0;
+      findIndex(originalArray, function (activeElement, activeElementIndex) {
+        originalArray.splice(activeElementIndex + 2, 1);  // deletes [2] but the callback will still run on it.
+        numberOfTimesCallbackHasRun++;
+      })
+      eq(originalArray[2], undefined);
+      eq(3, numberOfTimesCallbackHasRun);
+     }
+  });
+</script>

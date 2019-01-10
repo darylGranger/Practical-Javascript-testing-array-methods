@@ -1,0 +1,94 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function lastIndexOf(array, searchElement, startIndex) {
+
+        var indexToStartAt = startIndex || array.length - 1;
+
+        if (startIndex) { //this section will run if a startIndex has been supplied.
+
+            if (startIndex >= 0) {
+                  indexToStartAt = Math.floor(startIndex);  //this is for positive numbers and 0.
+            } else {
+                indexToStartAt = Math.ceil(startIndex);  //this is for negative numbers.
+            }
+
+
+            if (array.length + startIndex < 0) { //checks that there will be a valid starting index if startIndex is negative.
+                return -1;                       // and if not it returns -1 and does not search the array.
+            }
+
+            if (indexToStartAt < 0) {
+                indexToStartAt = array.length + indexToStartAt; //uses negative startIndex as an offset for the start of the search.
+            }
+        }
+
+        if (indexToStartAt > array.length - 1) {//the function works fine without this if statement, but it is here to catch
+            indexToStartAt = array.length - 1;  //really high numbers being passed in as startIndex and it having to process 
+        }                                      //millions or billions of non-existent indecies.
+
+
+
+        for (var i = indexToStartAt; i > -1; i--) {
+            if (array[i] === searchElement) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    tests({
+
+        'It should run backwards through the array, returning the index of the first element it finds that strictly matches the searchElement.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "cat");
+            eq(testSearch, 3);
+        },
+        'It should return -1 if the element is not in the array.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "girl");
+            eq(testSearch, -1);
+        },
+        'If startIndex is provided, it should start the search at that index.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "cat", 2);
+            eq(testSearch, 0)
+        },
+        'If startINdex is not provided, it should start the search on the last element in the array. (array.length -1).': function () {
+            var testSearch = lastIndexOf(["cat", "cat", "cat"], "cat");
+            eq(testSearch, 2);
+        },
+        'If startIndex is provided and is greater than the length of the array, the whole index is searched.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "cat", 1000000000);
+            eq(testSearch, 3);
+        },
+        'If startIndex is negative it will be used as an offset from the end of the array.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "cat", -3);
+            eq(testSearch, 0);
+        },
+        'If startIndex is negative and it results in a negative startingIndex, it should return -1 and not search the array.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "cat", -10);
+            eq(testSearch, -1);
+        },
+        'If startIndex is a positive decimal number, it should be rounded down to a whole number.': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "ball"], "dog", 3.69);
+            eq(testSearch, 1);
+        },
+        'If startIndex is a negative decimal number, it should be rounded up to a whole number, before it is used to offset the starting index': function () {
+            var testSearch = lastIndexOf(["cat", "dog", 45, "cat", "cat"], "cat", -3.78);
+            eq(testSearch, 0);
+        },
+
+    });
+</script>
+
+<!-- sypnosis - The lastIndexOf() method returns the last index at which a given element can be found in the array, or -1 if it is not present. The array is searched backwards, starting at fromIndex.
+syntax - lastIndexOf(targetArray, searchElement, optional fromIndex)
+
+
+ 
+It should run backwards through the array, returning the index of the first element it finds that strictly matches the searchElement.
+It should return -1 if the element is not in the array.
+If startIndex is provided, it should start the search at that index.
+If startINdex is not provided, it should start the search on the last element in the array. (array.length -1).
+If startIndex is provided and is greater than the length of the array, the whole index is searched.
+If startIndex is negative it will be used as an offset from the end of the array.
+If startIndex is negative and it results in a negative startingIndex, it should return -1 and not search the array.
+If startIndex is a positive decimal number, it should be rounded down to a whole number.
+If startIndex is a negative decimal number, it should be rounded up to a whole number, before it is used to offset the starting index -->

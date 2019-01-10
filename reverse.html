@@ -1,0 +1,68 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function reverse(targetArray){
+
+        var midPoint = targetArray.length/2;
+        var oddEvenCheck = targetArray.length % 2;
+
+        if (oddEvenCheck !== 0) {
+        for (var i = 0; i <= midPoint; i++) {
+            var lowSwap = targetArray[i];
+            var highSwap = targetArray[targetArray.length - i - 1];
+            var indexWalkBack = targetArray.length - 1 - i;
+
+            targetArray[i] = highSwap;
+            targetArray[indexWalkBack] = lowSwap;
+        }
+        } else {
+            for (var i = 0; i < midPoint; i++) {
+            var lowSwap = targetArray[i];
+            var highSwap = targetArray[targetArray.length - i - 1];
+            var indexWalkBack = targetArray.length - 1 - i;
+
+            targetArray[i] = highSwap;
+            targetArray[indexWalkBack] = lowSwap;
+        }
+        }
+
+        return targetArray;
+    };
+tests({
+
+  'it should return the object reference to the targetArray': function() {
+      var testArray = ["duck", "goose", "chicken"];
+      var test = reverse(testArray);
+      eq(test, testArray);
+  },
+  
+  'it should transpose the position of elements in target array':function(){
+      
+      var testArray = ["dog",2,,false];
+      reverse(testArray);
+      eq(testArray[0], false);
+      eq(testArray[1], undefined);
+      eq(testArray[2], 2);
+      eq(testArray[3], "dog");
+
+
+      var testArray = [1,2,3,4,5];
+      reverse(testArray);
+      eq(testArray[0], 5);
+      eq(testArray[1], 4);
+      eq(testArray[2], 3);
+      eq(testArray[3], 2);
+      eq(testArray[4], 1);
+  }
+  
+
+
+});
+</script>
+
+
+<!-- synopsis - The reverse() method reverses an array in place. The first array element becomes the last, and the last array element becomes the first.
+syntax - reverse(targetArray)
+
+it should return the object reference to targetArray.
+it should transpose the elements in target array. -->

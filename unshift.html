@@ -1,0 +1,69 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function unshift(targetArray, firstElement) {
+        var numberOfElementsToAdd = arguments.length - 1;
+        for (var i = targetArray.length - 1; i >= 0; i--) {
+            targetArray[i + numberOfElementsToAdd] = targetArray[i];
+        }
+        for (var j = 0; j < numberOfElementsToAdd; j++) {
+            targetArray[j] = arguments[j + 1];
+        }
+        return targetArray.length;
+    }
+
+
+
+    tests({
+
+        'it should add an element to targetArray.': function () {
+            var testArray = [1, 2, 3];
+            unshift(testArray, "dog");
+            eq(testArray[0], "dog");
+        },
+        'it should add multiple elements to the beginning of targetArray.': function () {
+            var testArray = [1, 2, 3];
+            unshift(testArray, "dog", "cat", "fish");
+            eq(testArray[0], "dog");
+            eq(testArray[1], "cat");
+            eq(testArray[2], "fish");
+            eq(testArray[3], "1");
+            eq(testArray[4], "2");
+            eq(testArray[5], "3");
+
+
+
+        },
+        'it should add all added elements to the beginning of the array. ': function () {
+            var testArray = [1, 2, 3];
+            unshift(testArray, "dog", "cat", "fish");
+            eq(testArray[0], "dog");
+            eq(testArray[1], "cat");
+            eq(testArray[2], "fish");
+        },
+        'it should return the new length of targetArray. ': function () {
+            var testArray = [1, 2, 3];
+            var test = unshift(testArray, "dog");
+            eq(test, 4);
+        },
+        'it should work the same when targetArray is an array like object. ': function () {
+            function arrayLikeObjectGenerator(){
+                return arguments;
+            }
+
+            var testArrayLikeObject = arrayLikeObjectGenerator("dog", "cat", "fish");
+            unshift(testArrayLikeObject, "cow");
+            eq(Array.isArray(testArrayLikeObject), false);
+            eq(testArrayLikeObject[0], "cow");
+        }
+
+    });
+
+</script>
+
+<!-- // syntax - function unshift(targetArray, as many elements in arguements as you want to pass in)
+// it should add an element to targetArray.
+// it should add multiple elements to the beginning of targetArray.
+// it should add all added elements to the beginning of the array.
+// it should return the new length of targetArray. 
+// it should work the same when targetArray is an array like object. -->

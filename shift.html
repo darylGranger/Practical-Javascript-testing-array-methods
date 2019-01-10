@@ -1,0 +1,91 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function shift(targetArray) {
+
+        if (targetArray.length === 0) {
+            return undefined;
+        }
+
+        var elementToReturn = targetArray[0];
+        delete targetArray[0];
+       
+        for (var i = 1; i < targetArray.length; i++) {
+            targetArray[i - 1] = targetArray[i];
+
+        }
+        targetArray.length = targetArray.length - 1;
+        return elementToReturn;
+    };
+
+
+    tests({
+
+        'it should remove the first element in targetArray.': function () {
+            var testArray = [1, 2, 3];
+            shift(testArray);
+
+            eq(testArray[0], 2);
+            eq(testArray[1], 3);
+            eq(testArray[2], undefined)
+
+        },
+        'it should change the length of the array.': function () {
+            var testArray = [1, 2, 3];
+            shift(testArray);
+            eq(testArray.length, 2);
+
+
+        },
+        'it should return the removed element': function () {
+            var testArray = ["dog", 2, 3];
+            var test = shift(testArray);
+            eq(test, "dog");
+        },
+        'it should return undefined if targetArray is empty.': function () {
+            var testArray = [];
+            var test = shift(testArray);
+            eq(test, undefined);
+        },
+        'it should shift the remaining indecies in targetArray down. ': function () {
+            var testArray = [1, 2, 3];
+            shift(testArray);
+            eq(testArray[0, 2]);
+            eq(testArray[1, 3]);
+        },
+        'it should return undefined if the first index is a hole. ': function () {
+            var testArray = [, 2, 3];
+            var test = shift(testArray);
+            eq(test, undefined);
+        },
+        'it should function on array-like objects. ': function () {
+            function testArrayLikeObjectGenerator() {
+                return arguments;
+            };
+            var testArrayLikeObject = testArrayLikeObjectGenerator("dog", "cat", "fish");
+            var test = shift(testArrayLikeObject);
+            eq(test, "dog");
+            eq(testArrayLikeObject.length, 2);
+
+        },
+        'it should return undefined if targetArray has length = 0. ': function () {
+            function testArrayLikeObjectGenerator() {
+                return arguments;
+            };
+            var testArrayLikeObject = testArrayLikeObjectGenerator("dog", "cat", "pizza");
+            testArrayLikeObject.length = 0;
+            eq(testArrayLikeObject.length, 0);
+        }
+
+
+    });
+</script>
+
+<!-- it should remove the first element in targetArray.
+it should change the length of the array.
+it should return the removed element.
+it should return undefined if targetArray is empty.
+it should shift the remaining indecies in targetArray down.
+it should return undefined if targetArray has length = 0.
+it should function on array-like objects.
+it should return undefined if the first index is a hole. -->

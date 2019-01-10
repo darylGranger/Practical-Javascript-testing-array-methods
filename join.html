@@ -1,0 +1,99 @@
+<script src="simpleTest.js"></script>
+<script>
+
+    function join(targetArray, seperator) {
+        var newString = "";
+
+        if (seperator === "") {
+            seperator = "";
+        } else {
+            var seperator = seperator || ",";
+        }
+
+        for (var i = 0; i < targetArray.length; i++) {
+
+            if (targetArray[i] === undefined) {
+                var newString = newString.concat("");
+            } else if (targetArray[i] === null) {
+                var newString = newString.concat("");
+            } else {
+                var newString = newString.concat(targetArray[i]);
+            }
+
+            if (i < targetArray.length - 1) {
+                var newString = newString.concat(seperator);//this line insert the seperator if the current element is not the last element in the array.
+            }
+        }
+
+        return newString;
+    }
+
+
+    tests({
+
+        'It should return a new string.': function () {
+            var testArray = ["cats", "and", "dogs"];
+            var joinTest = join(testArray);
+            var joinReturn = typeof joinTest;
+            eq(joinReturn, "string");
+        },
+        'It should make the returned string by concatenating the elements in the target array.': function () {
+            var testArray = ["cats"];
+            var joinTest = join(testArray);
+            eq(joinTest, "cats");
+        },
+        'It should seperate the array elements with the provided separator if one is provided.': function () {
+            var testArray = ["cats", "dogs", "fish"];
+            var joinTest = join(testArray, " + ");
+            eq(joinTest, "cats + dogs + fish");
+        },
+        'It should seperate elements in the new array by comas if a seperator is not provided': function () {
+            var testArray = ["cats", "and", "dogs"];
+            var joinTest = join(testArray);
+            eq(joinTest, "cats,and,dogs");
+        },
+        'It should not seperate elements in the new array if an empty string is passed in as the optionalSeperator.': function () {
+            var testArray = ["cats", "and", "dogs"];
+            var joinTest = join(testArray, "");
+            eq(joinTest, "catsanddogs");
+        },
+        'It should return an empty string if targetArray.length === 0.': function () {
+            var testArray = [];
+            var test = join(testArray);
+            eq(test.length, 0);
+        },
+        'It should convert array elements that are equal to undefined  into an empty string.': function () {
+            var testArray = ["cat", undefined, "fish"];
+            var test = join(testArray);
+            eq(test, "cat,,fish");
+        },
+        'It should convert array elements that are equal to null  into an empty string.': function () {
+            var testArray = ["cat", null, "fish"];
+            var test = join(testArray);
+            eq(test, "cat,,fish");
+        },
+        'It should treat holes in targetArray as empty strings and pass them into the new string.': function () {
+            var testArray = ["cat", , "fish"];
+            var test = join(testArray);
+            eq(test, "cat,,fish")
+        }
+
+    });
+</script>
+
+
+<!-- synopsis - The join() method creates and returns a new string by concatenating all of the elements in an array (or an array-like object), separated by commas or a specified separator string.
+syntax - join(targetArray,optionalSeparator);
+
+It should return a new string.
+It should make the returned string by concatenating the elements in the target array.
+It should seperate elements in the new array by comas (',').
+It should seperate the array elements with the provided separator if one is provided.
+It should not seperate elements in the new array if an empty string is passed in as the optionalSeperator.
+It should return an empty string if targetArray.length === 0.
+It should convert array elements that are equal to undefined  into an empty string.
+It should convert array elements that are equal to null  into an empty string.
+It should treat holes in targetArray as empty strings and pass them into the new string.
+
+
+THIS FUCKER WORKS JUST LIKE REDUCE WITH AN ACCUMULATOR AND A CURRENT VALUE, INSERTING THE SEPERATOR STRING IN BETWEEN -->
