@@ -3,18 +3,16 @@
 
     function splice(targetArray, start, deleteCount, insertionItemOne, insertionItemTwo) {
         //-------------------------------------------------------------------------------------------
-        //Multi-use variables
+        //MULTI USE VARIABLES
 
-      
-
-        var validDeleteCount;  //makes sure that deleteCount is a number - sloppy
-        if (deleteCount => 0 || deleteCount < 0) {
+        var validDeleteCount;  //makes sure that deleteCount is a number - to verbose.
+        if (deleteCount >= 0 || deleteCount < 0) {
             validDeleteCount = true;
         } else {
             validDeleteCount = false;
         }
-        var validStartCount;  //makes sure that start is a number - sloppy
-        if (start => 0 || start < 0) {
+        var validStartCount;  //makes sure that start is a number - too verbose.  
+        if (start >= 0 || start < 0) {
             validStartCount = true;
         } else {
             validStartCount = false;
@@ -26,14 +24,12 @@
             workingStart = start;
         }
 
-        if (start < 0) {
+        if (start < 0) {  //sets workingStart to zero if start or workingStart are negative.
             workingStart = targetArray.length + start;
             if (workingStart < 0) {
                 workingStart = 0;
             }
         }
-
-
 
         var workingDeleteCount;
         if (deleteCount !== undefined) {
@@ -50,15 +46,14 @@
             workingDeleteCount = 0;
         }
 
-
-
         var startDeleteCountTotal = workingStart + workingDeleteCount;
-        //-------------------------------------------------------------------------------------------
-        //THIS SECTION GENERATES USEFUL ARRAYS.
-
 
         //-------------------------------------------------------------------------------------------
+        //THIS SECTION GENERATES  ARRAYS THAT ARE DERIVED FROM TARGETARRAY AND PASSED IN ARGUMENTS.
+        //-------------------------------------------------------------------------------------------
+
         //this section makes an array of any and all items to be spliced in.
+
         var insertItemsArray = [];
 
         var j = 3;
@@ -76,7 +71,7 @@
             copyOfTargetArray[i] = targetArray[i];
         }
         //-------------------------------------------------------------------------------------------
-        //this section creates a new array of the portion of targetArray to that needs to be preserved and moved.
+        //this section creates a new array of the portion of targetArray  that needs to be preserved and moved.
         var itemsAfterDeletedIndecies = [];
         var m = 0;
 
@@ -84,22 +79,17 @@
             itemsAfterDeletedIndecies[m] = targetArray[i];
             m++;
         }
-        //-------------------------------------------------------------------------------------------
-        // console.log("insertItemsArray ---" + insertItemsArray);
-        // console.log("copyOfTargetArray ---" + copyOfTargetArray);  
-        // console.log("itemsAfterDeletedIndicies ---" + itemsAfterDeletedIndecies);
 
-       
-       
+
         //-------------------------------------------------------------------------------------------
-        //THIS IS THE section that generates the returnArray
+        //THIS IS THE SECTION THAT GENERATES THE RETURNARRAY
         var returnArray = [];
         var p = 0;
         for (var i = workingStart; p <= workingDeleteCount - 1; i++) {
             returnArray[p] = targetArray[i];
             p++;
         }
-       
+
         //-------------------------------------------------------------------------------------------
         //THIS IS THE start OF THE SECTION THAT  MAKES CHANGES TO TARGETARRAY
         var p = 0;
@@ -107,12 +97,9 @@
         var newLength = targetArray.length - workingDeleteCount + insertItemsArray.length;
 
         if ((validStartCount) && (validDeleteCount)) {  // this section runs if there is a start and deleteCount
+
             if (deleteCount > 0) { //this section runs if some element will be deleted.
 
-                // for (var s = start; s < startDeleteCountTotal; s++) {
-                //     targetArray[s] = itemsAfterDeletedIndecies[p];
-                //     p++;
-                // };
                 if (insertItemsArray.length > 0) {
 
                     for (var s = workingStart; p < insertItemsArray.length; s++) {
@@ -122,7 +109,7 @@
 
                 }
                 p = 0;
-              
+
                 for (var s = s; p < itemsAfterDeletedIndecies.length; s++) {
                     targetArray[s] = itemsAfterDeletedIndecies[p];
                     p++;
@@ -141,17 +128,11 @@
                 }
             }
 
-
-
-
-
         } else if ((workingStart) && (!validDeleteCount)) { //this section runs if there is a start and no valid deleteCount
             for (var s = workingStart; s < startDeleteCountTotal; s++) {
                 targetArray[s] = itemsAfterDeletedIndecies[p];
                 p++;
             };
-
-
 
         }
         targetArray.length = copyOfTargetArray.length - workingDeleteCount + insertItemsArray.length;
@@ -210,7 +191,7 @@
             eq(testArray[1], "cat");
             eq(testArray[2], 3);
 
-            var testArray = [1,2,3];
+            var testArray = [1, 2, 3];
             splice(testArray, 0, 1, "mouse", "dog", "fish");
             eq(testArray.length, 5);
             eq(testArray[0], "mouse");
@@ -232,15 +213,15 @@
 
         },
         'If start is a negative number it should be used as an offset from the end of the array.': function () {
-            var testArray = [1,2];
+            var testArray = [1, 2];
             splice(testArray, -1, 1, "fish");
             eq(testArray.length, 2);
             eq(testArray[0], 1);
             eq(testArray[1], "fish");
-            
+
         },
         'If start is a negative number and it would offset lower than zero, 0 will be used for start.': function () {
-            var testArray = [1,2];
+            var testArray = [1, 2];
             splice(testArray, -100, 1, "fish");
             eq(testArray.length, 2);
             eq(testArray[0], "fish");
@@ -248,13 +229,13 @@
         },
         //--------------------------------------------------------------------------------------------------------------------------------
         'If deleteCount  > (array.length - start) then all original elements in targetArray, starting with start, should be deleted.': function () {
-            var testArray = [1,2,3,4,5];
+            var testArray = [1, 2, 3, 4, 5];
             splice(testArray, 1, 10)
             eq(testArray.length, 1);
             eq(testArray[0], 1);
         },
         'If deleteCount is 0, no elements should be removed.': function () {
-            var testArray = [1,2];
+            var testArray = [1, 2];
             splice(testArray, 1, 0, "cat");
             eq(testArray.length, 3);
             eq(testArray[0], 1);
@@ -262,19 +243,19 @@
             eq(testArray[2], 2);
         },
         'If deleteCount is a negative number, no elements should be removed.': function () {
-            var testArray = [1,2,3];
+            var testArray = [1, 2, 3];
             splice(testArray, 1, -1);
             eq(testArray.length, 3);
 
         },
         //--------------------------------------------------------------------------------------------------------------------------------
         'If no optionalInsertionItems are defined and there is a deleteCount, splice should  only delete elements from targetArray.': function () {
-           var testArray = [1,2];
-           splice(testArray, 1, 1);
-           eq(testArray.length, 1);
+            var testArray = [1, 2];
+            splice(testArray, 1, 1);
+            eq(testArray.length, 1);
         },
         'If there are optionalInsertionItems, they should be inserted into targetArray starting at index[start], overwriting at most a number of items = to deleteCount.': function () {
-            var testArray = [1,2,3];
+            var testArray = [1, 2, 3];
             splice(testArray, 1, 1, "dog", "cat");
             eq(testArray[0], 1);
             eq(testArray[1], "dog");
@@ -283,7 +264,7 @@
 
         },
         'If there are optionalInsertionItems and deleteCount === 0, then the items should inserted into the array, beginning at start, and moving the elements at that index and higher up in their index counts enough to fit in the items, leaving no gaps. ': function () {
-            var testArray = [1,2];
+            var testArray = [1, 2];
             splice(testArray, 0, 0, "fish", "dog", "cat");
             eq(testArray.length, 5);
             eq(testArray[0], "fish");
@@ -294,7 +275,7 @@
         },
         //--------------------------------------------------------------------------------------------------------------------------------
         'It should return an array of the removed elements.': function () {
-            var testArray = [1,2,3];
+            var testArray = [1, 2, 3];
             var test = splice(testArray, 1, 1);
             eq(test.length, 1);
             eq(test[0], 2);
@@ -305,7 +286,7 @@
             eq(test.length, 0);
         },
         'It should return an array with a different length if the number of inserted items differs from the number of deleted items.': function () {
-            var testArray = [1,2];
+            var testArray = [1, 2];
             var test = splice(testArray, 1, 1);
             eq(test.length, 1);
 
