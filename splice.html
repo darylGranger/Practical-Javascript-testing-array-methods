@@ -3,50 +3,59 @@
 
     function splice(targetArray, start, deleteCount, insertionItemOne, insertionItemTwo) {
         //-------------------------------------------------------------------------------------------
-        //MULTI USE VARIABLES
-
-        var validDeleteCount;  //makes sure that deleteCount is a number - to verbose.
-        if (deleteCount >= 0 || deleteCount < 0) {
+        //Variables that check for valid arguments
+        
+        var validDeleteCount;  //Boolean variable that states if deleteCount is a number, and therefor valid and useful.
+        
+        if (typeof (deleteCount) === "number") { 
             validDeleteCount = true;
         } else {
             validDeleteCount = false;
         }
-        var validStartCount;  //makes sure that start is a number - too verbose.  
-        if (start >= 0 || start < 0) {
+        
+        var validStartCount;   //Boolean variable that states if start is a number, and therefor valid and useful.
+        
+        if (typeof(start) === "number") {
             validStartCount = true;
         } else {
             validStartCount = false;
         }
-        var workingStart;
-        if (start >= targetArray.length) {
+        
+        //-------------------------------------------------------------------------------------------
+        //"working" class of variables - adjusted arguments accounting for out of normal range numbers.
+       
+        var workingStart;  
+
+        if (start >= targetArray.length) { //sets targetArray.length as the highest possible start value.
             workingStart = targetArray.length;
         } else {
             workingStart = start;
         }
 
-        if (start < 0) {  //sets workingStart to zero if start or workingStart are negative.
-            workingStart = targetArray.length + start;
-            if (workingStart < 0) {
+        if (start < 0) {  //deals with negative values for start
+            workingStart = targetArray.length + start; //uses a negative value as an offset from the end of targetArray.
+            if (workingStart < 0) {  // sets [0] as the lowest possible starting index in case of -start > targetArray.length.
                 workingStart = 0;
             }
         }
 
         var workingDeleteCount;
-        if (deleteCount !== undefined) {
-            workingDeleteCount = deleteCount;
+
+        if (deleteCount !== undefined) {  
+            workingDeleteCount = deleteCount; 
         } else {
+            workingDeleteCount = targetArray.length - workingStart;  //assigns a value if no deleteCount is provided.
+        }
+
+        if (workingDeleteCount > targetArray.length - workingStart) {  //prevents non-existant indecies from being deleted.
             workingDeleteCount = targetArray.length - workingStart;
         }
 
-        if (workingDeleteCount > targetArray.length - workingStart) {
-            workingDeleteCount = targetArray.length - workingStart;
-        }
-
-        if (workingDeleteCount < 0) {
+        if (workingDeleteCount < 0) {  //sets deleteCount to 0 if it is less than 0.
             workingDeleteCount = 0;
         }
 
-        var startDeleteCountTotal = workingStart + workingDeleteCount;
+        var startDeleteCountTotal = workingStart + workingDeleteCount; //used for generating partial arrays to be put back together later.
 
         //-------------------------------------------------------------------------------------------
         //THIS SECTION GENERATES  ARRAYS THAT ARE DERIVED FROM TARGETARRAY AND PASSED IN ARGUMENTS.
@@ -56,9 +65,9 @@
 
         var insertItemsArray = [];
 
-        var j = 3;
+        var j = 3; //3 is the index of the first possible optionalInsertionItem arguement.
         var k = 0;
-        while (arguments[j]) {
+        while (arguments[j]) {  //if there is an argument[j] it will insert that intem into a new array.  Stops if arguments[j] === undfined.
             insertItemsArray[k] = arguments[j];
             j++;
             k++;
@@ -135,7 +144,7 @@
             };
 
         }
-        targetArray.length = copyOfTargetArray.length - workingDeleteCount + insertItemsArray.length;
+        targetArray.length = copyOfTargetArray.length - workingDeleteCount + insertItemsArray.length;  //this is some straight up array butchery.
         return returnArray;
 
     }
