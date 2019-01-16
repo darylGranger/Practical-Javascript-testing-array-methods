@@ -3,62 +3,38 @@
 
     function splice(targetArray, start, deleteCount, insertionItemOne, insertionItemTwo) {
         //-------------------------------------------------------------------------------------------
-        //Variables that check for valid arguments
+        // Variables that check for valid arguments
         
-        var validDeleteCount;  //Boolean variable that states if deleteCount is a number, and therefor valid and useful.
-        
-        if (typeof (deleteCount) === "number") { 
-            validDeleteCount = true;
-        } else {
-            validDeleteCount = false;
-        }
-        
-        var validStartCount;   //Boolean variable that states if start is a number, and therefor valid and useful.
-        
-        if (typeof(start) === "number") {
-            validStartCount = true;
-        } else {
-            validStartCount = false;
-        }
+        var validDeleteCount = (typeof (deleteCount) === "number"); 
+        var validStartCount = (typeof(start) === "number"); 
         
         //-------------------------------------------------------------------------------------------
-        //"working" class of variables - adjusted arguments accounting for out of normal range numbers.
+        // Adjusted arguments accouting for number values out of normal range.
        
-        var workingStart;  
+        var workingStart = (start >= targetArray.length) ? targetArray.length : start;  // If start is too high a value, set it to targetArray.length.
 
-        if (start >= targetArray.length) { //sets targetArray.length as the highest possible start value.
-            workingStart = targetArray.length;
-        } else {
-            workingStart = start;
-        }
-
-        if (start < 0) {  //deals with negative values for start
-            workingStart = targetArray.length + start; //uses a negative value as an offset from the end of targetArray.
-            if (workingStart < 0) {  // sets [0] as the lowest possible starting index in case of -start > targetArray.length.
+        if (start < 0) {  
+            workingStart = targetArray.length + start;                                  // Uses a negative value as an offset from the end of targetArray.
+            if (workingStart < 0) {                                                     // Sets [0] as the lowest possible starting index in case of -start > -targetArray.length.
                 workingStart = 0;
             }
         }
 
-        var workingDeleteCount;
 
-        if (deleteCount !== undefined) {  
-            workingDeleteCount = deleteCount; 
-        } else {
-            workingDeleteCount = targetArray.length - workingStart;  //assigns a value if no deleteCount is provided.
-        }
+        var workingDeleteCount = (deleteCount !== undefined) ? deleteCount : targetArray.length - workingStart; // Use deleteCount if there is one, else make it equal to distance to end of array from start.
 
-        if (workingDeleteCount > targetArray.length - workingStart) {  //prevents non-existant indecies from being deleted.
+        if (workingDeleteCount > targetArray.length - workingStart) {  
             workingDeleteCount = targetArray.length - workingStart;
         }
 
-        if (workingDeleteCount < 0) {  //sets deleteCount to 0 if it is less than 0.
+        if (workingDeleteCount < 0) {                                                                           //sets deleteCount to 0 if it is less than 0.
             workingDeleteCount = 0;
         }
 
-        var startDeleteCountTotal = workingStart + workingDeleteCount; //used for generating partial arrays to be put back together later.
+        var startDeleteCountTotal = workingStart + workingDeleteCount;                                          //used for generating partial arrays to be put back together later.
 
         //-------------------------------------------------------------------------------------------
-        //THIS SECTION GENERATES  ARRAYS THAT ARE DERIVED FROM TARGETARRAY AND PASSED IN ARGUMENTS.
+        //  ARRAYS THAT ARE DERIVED FROM TARGETARRAY AND PASSED IN ARGUMENTS.
         //-------------------------------------------------------------------------------------------
 
         //this section makes an array of any and all items to be spliced in.
@@ -91,7 +67,7 @@
 
 
         //-------------------------------------------------------------------------------------------
-        //THIS IS THE SECTION THAT GENERATES THE RETURNARRAY
+        // Generates the returnArray.
         var returnArray = [];
         var p = 0;
         for (var i = workingStart; p <= workingDeleteCount - 1; i++) {
@@ -100,7 +76,7 @@
         }
 
         //-------------------------------------------------------------------------------------------
-        //THIS IS THE start OF THE SECTION THAT  MAKES CHANGES TO TARGETARRAY
+        // Splice logic.
         var p = 0;
         var s = workingStart;
         var newLength = targetArray.length - workingDeleteCount + insertItemsArray.length;
