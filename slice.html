@@ -5,7 +5,8 @@
       
         var newArray = [];
 
-        if (begin > 0) {
+        //the following two if statements round any decimals places off of begin and end, towards 0 as the native function does.
+        if (begin > 0) {  
             begin = Math.floor(begin);
         } else {
             begin = Math.ceil(begin);
@@ -16,19 +17,19 @@
         } else {
             end = Math.ceil(end);
         }
+        //-----------------------------------------------------------------------------------------------------------------------
+        var startingIndex = begin || 0;  //assigns a default of 0 if begin is not provided.
+        var endIndex = end || targetArray.length; //assigns a default if end is not provided.
 
-        var startingIndex = begin || 0;
-        var endIndex = end || targetArray.length;
-
-        if (begin < 0) {
+        if (begin < 0) {  //uses a negative begin as an offset from the end of the array.
             startingIndex = endIndex + begin;
         }
 
-        if (end < 0) {
+        if (end < 0) {  //uses a negative end as an offset from the end of the array.
             endIndex = targetArray.length + end;
         }
 
-        if (end > targetArray.length) {
+        if (end > targetArray.length) {  //ensures end is maxed out at targetArray.length
             endIndex = targetArray.length;
         }
 
